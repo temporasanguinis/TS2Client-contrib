@@ -1,6 +1,6 @@
 {
   "version": 17,
-  "versionMessage": "Aggiunto autokick per monk e corretto vari errori",
+  "versionMessage": "Aggiunto autokick per monk e corretto vari errori in assist e restab",
   "requiresClientMajor": 1,
   "requiresClientMinor": 3,
   "requiresClientRevision": 3,
@@ -897,14 +897,6 @@
           "type": "VariableChanged",
           "condition": "TSRoom",
           "id": "",
-          "value": "\n\tprint(\"Sei a: '\" + this.RoomName + \"', Vnum: \"+this.TSRoom);",
-          "class": "debug",
-          "enabled": true
-        },
-        {
-          "type": "VariableChanged",
-          "condition": "TSRoom",
-          "id": "",
           "value": "this.pauseAutocleric = false;\nthis.preventAntispalm = false;\nsetTimeout(()=>send(\"onroomenter \" + this.TSRoom),0)\ndelay(\"aspettomapper\", 1, () => {\n  if (mapper.current) {\n      send(\"onroomenter \" + mapper.current.id)\n  }\n})",
           "class": "",
           "enabled": true
@@ -916,6 +908,15 @@
           "value": "delay(\"mobchanged\", 20, ()=>{\n  if (this.Mobs && this.TSLag != \"+\") {\n      send(\"autokillcheck\")\n  }\n});",
           "class": "autokill",
           "enabled": true
+        },
+        {
+          "type": "VariableChanged",
+          "condition": "TSRoom",
+          "id": "",
+          "value": "print(\"Sei a: '\" + this.RoomName + \"', Vnum: \"+this.TSRoom);",
+          "class": "debug",
+          "enabled": true,
+          "script": null
         }
       ]
     ],
@@ -1643,12 +1644,13 @@
     {
       "pattern": "^Fuggi a tutta velocita'\\.|^Con abilita' ti ritiri dalla battaglia\\.",
       "id": "",
-      "value": "this.autoassist = false",
-      "regex": false,
+      "value": "if (!this.stabTarget) send(\"autoassist false\");",
+      "regex": true,
       "is_script": true,
-      "class": "stab",
+      "class": "",
       "enabled": true,
-      "is_prompt": true,
+      "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -2131,7 +2133,7 @@
     {
       "pattern": "preinit",
       "id": "",
-      "value": "this.is_touch_device = () => {\n    if (\"ontouchstart\" in window || window.TouchEvent)\n        return true;\n\n    if (window.DocumentTouch && document instanceof DocumentTouch)\n        return true;\n\n    const prefixes = [\"\", \"-webkit-\", \"-moz-\", \"-o-\", \"-ms-\"];\n    const queries = prefixes.map(prefix => `(${prefix}touch-enabled)`);\n\n    return window.matchMedia(queries.join(\",\")).matches;\n};\n\nthis.autofuryEnabled = () => {\n\tif (this.canPlay) {\n      return this.autosong;\n    } else {\n      return this.autofury;\n    }\n};\n\nthis.autofuryToggle = () => {\n\tif (this.canPlay) {\n      send(\"autosong\");\n    } else {\n      send(\"autofury\");\n    }\n};\n\nif (this.canPlay) {\n  this.autofuryButton = \"AutoSong\"\n  scriptManager.linkEvent(\"autosong\", \"autofuryEnabled()\")\n} else {\n  this.autofuryButton = \"AutoFury\"\n  scriptManager.unlinkEvent(\"autosong\", \"autofuryEnabled()\")\n}\n\nthis.renting = false\nthis.ImmortalTrigger = false;\nthis.roundtime = 4000;\nthis.initDone = false;\ndelete this.postInit;\ntoggleClass(\"autologin\", true);\ntoggleClass(\"login\", true);\nthis.autokill = false;\n\ndelay(\"preinit\", 1, () => {\n  toggleClass(\"fixxa\", false);\n  toggleClass(\"questor\", false);\n  toggleClass(\"cleric\", (this.healtype||\"\").indexOf(\"C\")!=-1);\n  toggleClass(\"druid\", (this.healtype||\"\").indexOf(\"D\")!=-1);\n  toggleClass(\"mage\", (this.casttype||\"\").indexOf(\"M\")!=-1);\n  toggleClass(\"psionic\", (this.casttype||\"\").indexOf(\"P\")!=-1);\n  toggleClass(\"sorcerer\", !!this.mustMemorize);\n  toggleClass(\"bard\", !!this.canPlay);\n  toggleClass(\"monk\", !!this.canKick && !!!this.canBash);\n  toggleClass(\"autosong\", false);\n  toggleClass(\"autoinspire\", false);\n  toggleClass(\"fight\", !!!this.Immortal);\n  toggleClass(\"util\", true);\n  toggleClass(\"autocleric\", !!this.autocleric>0 && !!!this.Immortal);\n  toggleClass(\"autoassist\", !!this.autoassist && !!!this.Immortal);\n  toggleClass(\"autobash\", !!this.autobash && !!!this.Immortal);\n  toggleClass(\"autorescue\", !!this.autorescue && !!!this.Immortal);\n  toggleClass(\"autoarmi\", !!this.autoarmi && !!!this.Immortal);\n  toggleClass(\"antispalm\", !!this.antispalm && !!!this.Immortal);\n  toggleClass(\"debug\", false);\n  toggleClass(\"autogroup\", !!this.autogroup && !!!this.Immortal);\n  toggleClass(\"autoloot\", !!this.autoloot && !!!this.Immortal);\n  toggleClass(\"autologin\", false);\n  toggleClass(\"login\", true);\n  toggleClass(\"memorize\", false);\n  toggleClass(\"automemorize\", this.automemo && !!!this.Immortal);\n  toggleClass(\"selfsanc\", !!this.selfsanc && !!!this.Immortal);\n  toggleClass(\"selfshield\", !!this.selfshield && !!!this.Immortal);\n  toggleClass(\"gtalign\", false);\n  toggleClass(\"thief\", false);\n  toggleClass(\"autokill\", false);\n  toggleClass(\"afk\", !!this.afk);\n\n});\n",
+      "value": "this.is_touch_device = () => {\n    if (\"ontouchstart\" in window || window.TouchEvent)\n        return true;\n\n    if (window.DocumentTouch && document instanceof DocumentTouch)\n        return true;\n\n    const prefixes = [\"\", \"-webkit-\", \"-moz-\", \"-o-\", \"-ms-\"];\n    const queries = prefixes.map(prefix => `(${prefix}touch-enabled)`);\n\n    return window.matchMedia(queries.join(\",\")).matches;\n};\n\nthis.autofuryEnabled = () => {\n\tif (this.canPlay) {\n      return this.autosong;\n    } else {\n      return this.autofury;\n    }\n};\n\nthis.autofuryToggle = () => {\n\tif (this.canPlay) {\n      send(\"autosong\");\n    } else {\n      send(\"autofury\");\n    }\n};\n\nif (this.canPlay) {\n  this.autofuryButton = \"AutoSong\"\n  scriptManager.linkEvent(\"autosong\", \"autofuryEnabled()\")\n} else {\n  this.autofuryButton = \"AutoFury\"\n  scriptManager.unlinkEvent(\"autosong\", \"autofuryEnabled()\")\n}\n\nthis.renting = false\nthis.ImmortalTrigger = false;\nthis.roundtime = 4000;\nthis.initDone = false;\ndelete this.postInit;\ntoggleClass(\"autologin\", true);\ntoggleClass(\"login\", true);\nthis.autokill = false;\nthis.stabTarget = null;\n\ndelay(\"preinit\", 1, () => {\n  toggleClass(\"fixxa\", false);\n  toggleClass(\"questor\", false);\n  toggleClass(\"cleric\", (this.healtype||\"\").indexOf(\"C\")!=-1);\n  toggleClass(\"druid\", (this.healtype||\"\").indexOf(\"D\")!=-1);\n  toggleClass(\"mage\", (this.casttype||\"\").indexOf(\"M\")!=-1);\n  toggleClass(\"psionic\", (this.casttype||\"\").indexOf(\"P\")!=-1);\n  toggleClass(\"sorcerer\", !!this.mustMemorize);\n  toggleClass(\"bard\", !!this.canPlay);\n  toggleClass(\"monk\", !!this.canKick && !!!this.canBash);\n  toggleClass(\"autosong\", false);\n  toggleClass(\"autoinspire\", false);\n  toggleClass(\"fight\", !!!this.Immortal);\n  toggleClass(\"util\", true);\n  toggleClass(\"autocleric\", !!this.autocleric>0 && !!!this.Immortal);\n  toggleClass(\"autoassist\", !!this.autoassist && !!!this.Immortal);\n  toggleClass(\"autobash\", !!this.autobash && !!!this.Immortal);\n  toggleClass(\"autorescue\", !!this.autorescue && !!!this.Immortal);\n  toggleClass(\"autoarmi\", !!this.autoarmi && !!!this.Immortal);\n  toggleClass(\"antispalm\", !!this.antispalm && !!!this.Immortal);\n  toggleClass(\"debug\", false);\n  toggleClass(\"autogroup\", !!this.autogroup && !!!this.Immortal);\n  toggleClass(\"autoloot\", !!this.autoloot && !!!this.Immortal);\n  toggleClass(\"autologin\", false);\n  toggleClass(\"login\", true);\n  toggleClass(\"memorize\", false);\n  toggleClass(\"automemorize\", this.automemo && !!!this.Immortal);\n  toggleClass(\"selfsanc\", !!this.selfsanc && !!!this.Immortal);\n  toggleClass(\"selfshield\", !!this.selfshield && !!!this.Immortal);\n  toggleClass(\"gtalign\", false);\n  toggleClass(\"thief\", false);\n  toggleClass(\"autokill\", false);\n  toggleClass(\"afk\", !!this.afk);\n\n});\n",
       "regex": false,
       "is_script": true,
       "class": "",
@@ -2166,18 +2168,19 @@
     {
       "pattern": "flee",
       "id": "",
-      "value": "if (this.autoassist) send(\"autoassist false\");\nif (this.seduto) {\n  send(\"stand\");\n}\nsend(\"~flee\");",
+      "value": "if (this.seduto) {\n  send(\"stand\");\n}\nsend(\"~flee\");",
       "regex": false,
       "is_script": true,
       "class": "fight",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
       "pattern": "checkAssist",
       "id": "",
-      "value": "if (this.disableCheckAssist == true || this.preventAutoassist == true) \n{\n  //this.preventAutoassist = false\n  if (this.autobash) {\n    delay(\"checkAssist\", (this.autocleric ? 2000 : 0 + 2000), () => {send(\"checkAssist\")})\n  }\n  return;\n}\nthis.disableCheckAssist = true;\nsetTimeout(()=>{this.disableCheckAssist=false}, 200);\n\nconst newTank = this.TSTank;\nconst tankState = this.TSTankCond;\n\nlet cleanCastingTimeout = () => {\n  if (this.castTimeout) clearTimeout(this.castTimeout);\n  this.castTimeout = 0;\n}\nif (this.autostop && tankState && tankState != \"*\" && !this.preventAutoStop && !this.isTank()) {\n  this.preventAutoStop = true;\n  this.preventAutoassist = true;\n  if (this.TSPosizione!=\"In piedi\") {\n    send(\"stand\");\n  }\n  send(\"~stop\");\n  delay(\"autostop1\", 4000, () => {\n    this.preventAutoassist = false\n    send(\"checkAssist\")\n  })\n  delay(\"autostop2\", 8250, () => {\n    this.preventAutoStop = false\n    send(\"checkAssist\")\n  })\n}\nlet rescuato = false;\nif (this.autorescue && newTank != \"*\" && newTank!=this.TSPersonaggio && !this.preventAutoRescue) {\n  this.preventAutoRescue = true;\n  if (this.TSPosizione!=\"In piedi\") {\n    send(\"stand\");\n  }\n  send(\"rescue \" + newTank);\n  rescuato = true;\n  setTimeout(() => {this.preventAutoRescue = false}, 4000)\n}\nif (newTank != \"*\" && tankState == \"*\") {\n  if ((classEnabled(\"autoassist\")||(this.autostab))) {\n    this.preventAutoassist = true\n    setTimeout(() => {\n      this.TSTankCond=\"\"\n      this.preventAutoassist = false\n    }, 3000)\n    if (this.autostab) {\n      if (this.usiPierce != this.canPlay) {\n        send(`${this.canPlay?\"slam\":\"backstab\"} ${this.TSMob.split(\" \")[0]}`)\n        if (!this.canPlay && this.afk && !this.autobash) {\n          send(\"~stop\")\n        }\n        return;\n      }\n    }\n    if (!classEnabled(\"autoassist\")) {\n    \treturn;\n    }\n    if (this.autofury) {\n      send(`fury ${this.TSMob.split(\" \")[0]}`)\n    } else {\n      if (!rescuato) send(\"assist \" + this.cleanupName(newTank));\n    }\n    if ((this.canBash||this.canKick) && this.autobash) {\n      setTimeout(()=>{if (this.inCombat()) send(\"bash\")},500);\n    }\n    if (newTank==this.TSPersonaggio) return;\n  }\n  if (this.autocast && this.TSMob!=\"*\" && this.spellOffensivo) {\n    cleanCastingTimeout();\n    const comando = this.mustMemorize ? \"recall\" : \"cast\";\n    let casta = () => {\n      if (this.TSMob==\"*\" || !this.autocast) {\n        cleanCastingTimeout();\n        return;\n      }\n      if (this.TSLag==\"-\") {\n      \tsend(`${comando} '${this.spellOffensivo}' ${this.TSMob.split(\" \")[0]}`)\n      }\n      let lag = Math.floor(this.roundtime*1.5);\n      if (this.autocleric) lag += 3000;\n      this.castTimeout = setTimeout(() => {casta()}, lag)\n    }\n    this.castTimeout = setTimeout(() => {casta()}, 0)\n  }\n} else if (newTank != \"*\" && tankState != \"*\") {\n  if (this.autobash && this.TSLag != \"+\" && this.inCombat()) {\n    delay(\"checkAssist\", (this.autocleric ? 2000 : 0 + 2000),() => {send(\"checkAssist\")})\n    if (this.TSPosizione != \"In piedi\" && (!this.canBash && this.canKick)) {\n      send(\"springleap\");\n      return;\n    }\n    else if (this.TSPosizione != \"In piedi\" && (this.canBash)) {\n      send(\"stand\");\n    }\n    send(\"bash\");    \n  } else if (this.autobash && this.inCombat()) {\n    delay(\"checkAssist\", (this.autocleric ? 2000 : 0 + 2000),() => {send(\"checkAssist\")})\n  }\n} else if (newTank == \"*\") {\n  cleanCastingTimeout();\n}\n",
+      "value": "if (this.disableCheckAssist == true || this.preventAutoassist == true) \n{\n  //this.preventAutoassist = false\n  if (this.autobash) {\n    delay(\"checkAssist\", (this.autocleric ? 2000 : 0 + 2000), () => {send(\"checkAssist\")})\n  }\n  return;\n}\nthis.disableCheckAssist = true;\nsetTimeout(()=>{this.disableCheckAssist=false}, 200);\n\nconst newTank = this.TSTank;\nconst tankState = this.TSTankCond;\n\nlet cleanCastingTimeout = () => {\n  if (this.castTimeout) clearTimeout(this.castTimeout);\n  this.castTimeout = 0;\n}\nif (this.autostop && tankState && tankState != \"*\" && !this.preventAutoStop && !this.isTank()) {\n  this.preventAutoStop = true;\n  this.preventAutoassist = true;\n  if (this.TSPosizione!=\"In piedi\") {\n    send(\"stand\");\n  }\n  send(\"~stop\");\n  delay(\"autostop1\", 4000, () => {\n    this.preventAutoassist = false\n    send(\"checkAssist\")\n  })\n  delay(\"autostop2\", 8250, () => {\n    this.preventAutoStop = false\n    send(\"checkAssist\")\n  })\n}\nlet rescuato = false;\nif (this.autorescue && newTank != \"*\" && newTank!=this.TSPersonaggio && !this.preventAutoRescue) {\n  this.preventAutoRescue = true;\n  if (this.TSPosizione!=\"In piedi\") {\n    send(\"stand\");\n  }\n  send(\"rescue \" + newTank);\n  rescuato = true;\n  setTimeout(() => {this.preventAutoRescue = false}, 4000)\n}\nif (newTank != \"*\" && tankState == \"*\") {\n  if ((classEnabled(\"autoassist\")||(this.autostab))) {\n    this.preventAutoassist = true\n    setTimeout(() => {\n      this.TSTankCond=\"\"\n      this.preventAutoassist = false\n    }, 3000)\n    if (this.autostab) {\n      if (this.usiPierce != this.canPlay) {\n        send(`${this.canPlay?\"slam\":\"backstab\"} ${this.TSMob.split(\" \")[0]}`)\n        if (!this.canPlay && this.afk && !this.autobash) {\n          send(\"~stop\")\n        }\n        return;\n      }\n    }\n    if (!classEnabled(\"autoassist\")) {\n    \treturn;\n    }\n    if (this.autofury) {\n      send(`fury ${this.TSMob.split(\" \")[0]}`)\n    } else {\n      if (!rescuato && this.cleanupName(newTank).toLowerCase() != this.TSPersonaggio.toLowerCase()) send(\"assist \" + this.cleanupName(newTank));\n    }\n    if ((this.canBash||this.canKick) && this.autobash) {\n      setTimeout(()=>{if (this.inCombat()) send(\"bash\")},500);\n    }\n    if (newTank==this.TSPersonaggio) return;\n  }\n  if (this.autocast && this.TSMob!=\"*\" && this.spellOffensivo) {\n    cleanCastingTimeout();\n    const comando = this.mustMemorize ? \"recall\" : \"cast\";\n    let casta = () => {\n      if (this.TSMob==\"*\" || !this.autocast) {\n        cleanCastingTimeout();\n        return;\n      }\n      if (this.TSLag==\"-\") {\n      \tsend(`${comando} '${this.spellOffensivo}' ${this.TSMob.split(\" \")[0]}`)\n      }\n      let lag = Math.floor(this.roundtime*1.5);\n      if (this.autocleric) lag += 3000;\n      this.castTimeout = setTimeout(() => {casta()}, lag)\n    }\n    this.castTimeout = setTimeout(() => {casta()}, 0)\n  }\n} else if (newTank != \"*\" && tankState != \"*\") {\n  if (this.autobash && this.TSLag != \"+\" && this.inCombat()) {\n    delay(\"checkAssist\", (this.autocleric ? 2000 : 0 + 2000),() => {send(\"checkAssist\")})\n    if (this.TSPosizione != \"In piedi\" && (!this.canBash && this.canKick)) {\n      send(\"springleap\");\n      return;\n    }\n    else if (this.TSPosizione != \"In piedi\" && (this.canBash)) {\n      send(\"stand\");\n    }\n    send(\"bash\");    \n  } else if (this.autobash && this.inCombat()) {\n    delay(\"checkAssist\", (this.autocleric ? 2000 : 0 + 2000),() => {send(\"checkAssist\")})\n  }\n} else if (newTank == \"*\") {\n  cleanCastingTimeout();\n}\n",
       "regex": false,
       "is_script": true,
       "class": "",
@@ -2420,8 +2423,7 @@
       "is_script": true,
       "class": "",
       "enabled": true,
-      "is_prompt": false,
-      "script": null
+      "is_prompt": false
     },
     {
       "pattern": "^bark (.*)|^bark$",
@@ -2898,8 +2900,7 @@
       "is_script": true,
       "class": "",
       "enabled": true,
-      "is_prompt": false,
-      "script": null
+      "is_prompt": false
     },
     {
       "pattern": "sr",
@@ -3232,8 +3233,7 @@
       "is_script": true,
       "class": "",
       "enabled": true,
-      "is_prompt": false,
-      "script": null
+      "is_prompt": false
     },
     {
       "pattern": "ar",
