@@ -1,6 +1,6 @@
 {
-  "version": 19,
-  "versionMessage": "Aggiunto delle script per gli identify",
+  "version": 20,
+  "versionMessage": "Correzioni script per gli identify",
   "requiresClientMajor": 1,
   "requiresClientMinor": 3,
   "requiresClientRevision": 3,
@@ -1252,7 +1252,7 @@
     {
       "pattern": "^\\[.\\d\\] ([^([]+)( \\(|\\[\\d+\\]|)",
       "id": "ident_inv",
-      "value": "var util = window.dbIdentUtil;\nlet descshort = match[1].trim();\nlet r = util.withshort(descshort);\nif (util.debug) {console.log(\"Item trovato: nel trigget ident_inv:\" + match[1])}\nif (r.length>0) {\n  console.log(util)\n  let firstword = $1;\n  const spaceIndex = firstword.indexOf(\" \");\n  if (spaceIndex>-1) {\n    firstword = firstword.substring(0, spaceIndex);\n  }\n\n  let testoident = ((r.length==1) && (r[0][util.db.fieldsPos.Provenienza]==\"\")) ?\n      color(\"[?]\",\"yellow\") : color(\"[?]\",\"green\");\n\n  //sub(firstword, link(testoident,()=>{print(out)},\"vedi identify\") + \" \" + firstword);\n  sub(firstword, link(testoident,()=>{\n    let out = util.getStringIdents(r);\n    print(out)\n  },\"vedi identify\") + \" \" + firstword);\n}",
+      "value": "var util = window.dbIdentUtil;\nlet descshort = match[1].trim();\nlet r = util.withshort(descshort);\nif (util.debug) {console.log(\"Item trovato: nel trigget ident_inv:\" + match[1])}\nif (r.length>0) {\n  console.log(util)\n  let firstword = $1;\n  const spaceIndex = firstword.indexOf(\" \");\n  if (spaceIndex>-1) {\n    firstword = firstword.substring(0, spaceIndex);\n  }\n\n  let testoident = ((r.length==1) && (r[0][util.db.fieldsPos.Provenienza]==\"\")) ?\n      color(\"[?]\",\"maroon\") : color(\"[?]\",\"green\");\n\n  //sub(firstword, link(testoident,()=>{print(out)},\"vedi identify\") + \" \" + firstword);\n  sub(firstword, link(testoident,()=>{\n    let out = util.getStringIdents(r);\n    print(out)\n  },\"vedi identify\") + \" \" + firstword);\n}",
       "regex": true,
       "is_script": true,
       "class": "Ident",
@@ -1264,7 +1264,7 @@
     {
       "pattern": "^(.+)$",
       "id": "roomContent",
-      "value": "//Normalmente NON abilitato.\n//Viene abilitato da altri trigger/alias\n\nif (match[0] == \"\" || \n    match[0] == \"-----------------\" || \n    match[0].search(/^H:\\[\\d+\\/\\d+\\] M:\\[\\d+\\/\\d+\\] V:\\[\\d+\\/\\d+\\]/)>-1) {\n\ttoggleTrigger(\"roomContent\",false);\n} else {\n    var util = window.dbIdentUtil;\n    let desclong = match[1];\n  \t//se presente alla fine (condizioni) lo tolgo\n    let m = desclong.match(/([^(]+)(?=\\()/);\n\tif (m != null) {desclong = m[1]};\n    //se pezzi multipli con [] a inizio e fine le tolgo\n\tm = desclong.match(/^(?:\\[..\\] |)(.+?)(?:\\[\\d+\\]|)$/);\n    if (m != null) {desclong = m[1]}; \n    desclong = desclong.trim()\n    if (util.debug) {console.log(\"Item trovato nel trigger roomContent:\" + desclong)}\n    let r = util.withlong(desclong);\n    if (r.length>0) {\n      //const start = performance.now(); //PROFILAZIONE      \n      let firstword = $1;\n      const spaceIndex = firstword.indexOf(\" \");\n      if (spaceIndex>-1) {\n      \tfirstword = firstword.substring(0, spaceIndex);\n      }\n      let testoident = ((r.length==1) && (r[0][util.db.fieldsPos.Provenienza]==\"\") ) ?\n          color(\"[?]\",\"red\") : color(\"[?]\",\"yellowgreen\");\n      \n      sub(firstword, link(testoident,()=>{\n        let out = util.getStringIdents(r);\n        print(out)\n      },\"vedi identify\") + \" \" + firstword);\n      //const duration = performance.now() - start; //PROFILAZIONE\n      //print(\"Profilazione: \" + duration, \"Social\"); \n    }  \n}\n",
+      "value": "//Normalmente NON abilitato.\n//Viene abilitato da altri trigger/alias\n\nif (match[0] == \"\" || \n    match[0] == \"-----------------\" || \n    match[0].search(/^H:\\[\\d+\\/\\d+\\] M:\\[\\d+\\/\\d+\\] V:\\[\\d+\\/\\d+\\]/)>-1) {\n\ttoggleTrigger(\"roomContent\",false);\n} else {\n    var util = window.dbIdentUtil;\n    let desclong = match[1];\n  \t//se presente alla fine (condizioni) lo tolgo\n    let m = desclong.match(/([^(]+)(?=\\()/);\n\tif (m != null) {desclong = m[1]};\n    //se pezzi multipli con [] a inizio e fine le tolgo\n\tm = desclong.match(/^(?:\\[..\\] |)(.+?)(?:\\[\\d+\\]|)$/);\n    if (m != null) {desclong = m[1]}; \n    desclong = desclong.trim()\n    if (util.debug) {console.log(\"Item trovato nel trigger roomContent:\" + desclong)}\n    let r = util.withlong(desclong);\n    if (r.length>0) {\n      //const start = performance.now(); //PROFILAZIONE      \n      let firstword = $1;\n      const spaceIndex = firstword.indexOf(\" \");\n      if (spaceIndex>-1) {\n      \tfirstword = firstword.substring(0, spaceIndex);\n      }\n      let testoident = ((r.length==1) && (r[0][util.db.fieldsPos.Provenienza]==\"\") ) ?\n          color(\"[?]\",\"maroon\") : color(\"[?]\",\"green\");\n      \n      sub(firstword, link(testoident,()=>{\n        let out = util.getStringIdents(r);\n        print(out)\n      },\"vedi identify\") + \" \" + firstword);\n      //const duration = performance.now() - start; //PROFILAZIONE\n      //print(\"Profilazione: \" + duration, \"Social\"); \n    }  \n}\n",
       "regex": true,
       "is_script": true,
       "class": "Ident",
@@ -2792,23 +2792,24 @@
     {
       "pattern": "nonAfkProc",
       "id": "",
-      "value": "if (this.Immortal) return;\nsend(\"sancaAutosanc\")\nif (this.TSSpells.toLowerCase().indexOf(\"f\")==-1 && this.selfshield) {\n    send(\"fs\");\n}\nif (this.TSSpells.toLowerCase().indexOf(\"s\")==-1 && this.healtype==\"C\" && this.selfsanc) {\n  send(\"sanc\");\n} else if (this.TSSpells.toLowerCase().indexOf(\"n\")==-1 && this.healtype==\"D\" && this.selfsanc) {\n  if (this.TSSettore != \"Chiuso\" && this.TSSpells.toLowerCase().indexOf(\"s\")==-1) send(\"sanc\");\n}",
+      "value": "if (this.Immortal||!this.TSSpells) return;\nsend(\"sancaAutosanc\")\nif (this.TSSpells.toLowerCase().indexOf(\"f\")==-1 && this.selfshield) {\n    send(\"fs\");\n}\nif (this.TSSpells.toLowerCase().indexOf(\"s\")==-1 && this.healtype==\"C\" && this.selfsanc) {\n  send(\"sanc\");\n} else if (this.TSSpells.toLowerCase().indexOf(\"n\")==-1 && this.healtype==\"D\" && this.selfsanc) {\n  if (this.TSSettore != \"Chiuso\" && this.TSSpells.toLowerCase().indexOf(\"s\")==-1) send(\"sanc\");\n}",
       "regex": false,
       "is_script": true,
       "class": "",
       "enabled": true,
       "is_prompt": false,
-      "script": null
+      "shortcut": ""
     },
     {
       "pattern": "sancaAutosanc",
       "id": "",
-      "value": "if (this.Immortal) return;\nlet daSancare = [];\nlet nonSancati = [];\nlet sancati = 0;\nconst grp=JSON.parse(this.Gruppo||{})\nfor (let nome in grp) {\n    if (nome == \"tank\" || nome == \"mob\") continue;\n    // non in room o non curabile\n    if (grp[nome].hide || !grp[nome].inroom || grp[nome].pkill) {\n      continue;\n    }\n    if (!grp[nome].sanc && (this.listaAutosanc||[]).indexOf(nome)>-1) {\n      daSancare.push(nome)\n    } else if (!grp[nome].sanc) {\n     nonSancati.push(nome)\n    } else if (grp[nome].sanc) {\n      sancati++;\n    }\n  }\nif (daSancare.length) for (let nome of daSancare) {\n  send(\"sanc \" + nome)\n}\n\nif (this.afk && this.grandezzaGruppo>4 && sancati && nonSancati.length && sancati > 3) {\n  send(\"gt Alcuni in gruppo non sono sancati: \" + nonSancati.join(\",\"))\n}\n",
+      "value": "if (this.Immortal) return;\nlet daSancare = [];\nlet nonSancati = [];\nlet sancati = 0;\nconst grp=JSON.parse(this.Gruppo||\"{}\")\nfor (let nome in grp) {\n    if (nome == \"tank\" || nome == \"mob\") continue;\n    // non in room o non curabile\n    if (grp[nome].hide || !grp[nome].inroom || grp[nome].pkill) {\n      continue;\n    }\n    if (!grp[nome].sanc && (this.listaAutosanc||[]).indexOf(nome)>-1) {\n      daSancare.push(nome)\n    } else if (!grp[nome].sanc) {\n     nonSancati.push(nome)\n    } else if (grp[nome].sanc) {\n      sancati++;\n    }\n  }\nif (daSancare.length) for (let nome of daSancare) {\n  send(\"sanc \" + nome)\n}\n\nif (this.afk && this.grandezzaGruppo>4 && sancati && nonSancati.length && sancati > 3) {\n  send(\"gt Alcuni in gruppo non sono sancati: \" + nonSancati.join(\",\"))\n}\n",
       "regex": false,
       "is_script": true,
       "class": "",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -3314,7 +3315,7 @@
     {
       "pattern": "^identimport( privato$| pubblico$| online$| purge$|$)",
       "id": "",
-      "value": "var util = window.dbIdentUtil;\nconst database = match[1].trim() || \"privato\";\n\n\nfunction importPublicoObj(objparsed) {\n  print(\"Aggiornato DB Ident Pubblico a v\" + objparsed.dbinfo.ver)\n  util.db.ogglistPubl = objparsed.data;\n  util.db.dbinfo = objparsed.dbinfo;  \n  util.db.fields = objparsed.fields;\n  util.save(true);\n}\n\nfunction importPublico(text) {\n  let objparsed = JSON.parse(text);\n  importPublicoObj(objparsed)\n}\n\nfunction importPrivato(text) {\n  let objparsed = JSON.parse(text);\n  util.db.ogglistPriv = objparsed.data;\n/*  if (Object.keys(util.db.dbinfo).length == 0) {\n  \tutil.db.dbinfo = objparsed.dbinfo;\n    console.log(objparsed);\n  }\n  if (!util.db.fields || !util.db.fields.length) {\n  \tutil.db.fields = objparsed.fields;\n  }\n*/\n  util.save(false);\n}\n\n\nfunction importFromFile(callback) {\n    if (!callback) return;\n    let inp = document.createElement(\"input\");\n    inp.type = \"file\";\n    inp.style.visibility = \"hidden\";\n\n    inp.addEventListener(\"change\", (e) => {\n        let file = e.target.files[0];\n        if (!file) {\n            return;\n        }\n\n        let reader = new FileReader();\n        reader.onload = (e1) => {\n            let text = e1.target.result;\n            callback(text)\n        };\n        reader.readAsText(file);\n\n    });\n\n    document.body.appendChild(inp);\n    inp.click();\n    document.body.removeChild(inp);\n}\n\nif (database == \"pubblico\") {\n  importFromFile(importPublico);\n} else if (database == \"privato\") {\n  importFromFile(importPrivato);\n} else if (database == \"purge\") {\n  util.db.ogglistPubl = [];\n  util.db.ogglistPriv = [];\n  util.db.dbinfo = {};  \n  util.db.fields = [];\n  util.save(true);\n  util.save(false);\n} else if (database == \"online\") {\n  \n  const res1 = await fetch(\"/client/identDbPublicVersion.json\")\n  const verData = await res1.json();\n  \n  //print(\"DB Ident Online v\" + verData.dbinfo.ver)\n  //print(\"DB Ident Pubblico v\" + (util.db.dbinfo?.ver || 0))\n  \n  if (verData.dbinfo.ver > (util.db.dbinfo?.ver || 0)) {\n    // versione nuova online, aggiorniamo il pubblico\n    \n  \tconst res2 = await fetch(\"/client/identDbPublic.json\")\n  \tconst dbObj = await res2.json();\n    importPublicoObj(dbObj)\n    send(\"ident_init\")\n  } else {\n    print(\"DB Ident pubblico v\" + verData.dbinfo.ver + \" gia' caricato.\")\n    send(\"ident_init\")\n  }\n  \n}\n\n",
+      "value": "let util = window.dbIdentUtil;\nif (!util) {\n  send(\"ident_init\")\n}\nutil = window.dbIdentUtil;\n\nconst database = match[1].trim() || \"privato\";\n\n\nfunction importPublicoObj(objparsed) {\n  util.db.ogglistPubl = objparsed.data;\n  util.db.dbinfo = objparsed.dbinfo;  \n  util.db.fields = objparsed.fields;\n  util.save(true);\n}\n\nfunction importPublico(text) {\n  let objparsed = JSON.parse(text);\n  importPublicoObj(objparsed)\n}\n\nfunction importPrivato(text) {\n  let objparsed = JSON.parse(text);\n  util.db.ogglistPriv = objparsed.data;\n/*  if (Object.keys(util.db.dbinfo).length == 0) {\n  \tutil.db.dbinfo = objparsed.dbinfo;\n    console.log(objparsed);\n  }\n  if (!util.db.fields || !util.db.fields.length) {\n  \tutil.db.fields = objparsed.fields;\n  }\n*/\n  util.save(false);\n}\n\n\nfunction importFromFile(callback) {\n    if (!callback) return;\n    let inp = document.createElement(\"input\");\n    inp.type = \"file\";\n    inp.style.visibility = \"hidden\";\n\n    inp.addEventListener(\"change\", (e) => {\n        let file = e.target.files[0];\n        if (!file) {\n            return;\n        }\n\n        let reader = new FileReader();\n        reader.onload = (e1) => {\n            let text = e1.target.result;\n            callback(text)\n        };\n        reader.readAsText(file);\n\n    });\n\n    document.body.appendChild(inp);\n    inp.click();\n    document.body.removeChild(inp);\n}\n\nif (database == \"pubblico\") {\n  importFromFile(importPublico);\n} else if (database == \"privato\") {\n  importFromFile(importPrivato);\n} else if (database == \"purge\") {\n  util.db.ogglistPubl = [];\n  util.db.ogglistPriv = [];\n  util.db.dbinfo = {};  \n  util.db.fields = [];\n  util.save(true);\n  util.save(false);\n} else if (database == \"online\") {\n  \n  const res1 = await fetch(\"/client/identDbPublicVersion.json\")\n  const verData = await res1.json();\n  \n  //print(\"DB Ident Online v\" + verData.dbinfo.ver)\n  //print(\"DB Ident Pubblico v\" + (util.db.dbinfo?.ver || 0))\n  if (verData.dbinfo.ver > (util.db.dbinfo?.ver || 0)) {\n    // versione nuova online, aggiorniamo il pubblico\n    \n  \tconst res2 = await fetch(\"/client/identDbPublic.json\")\n  \tconst dbObj = await res2.json();\n    importPublicoObj(dbObj)\n\tprint(\"Eseguo aggiornamento del DB Identify pubblico a v\" + verData.dbinfo.ver)\n  \n  } else {\n    //print(\"La versione del DB Identify pubblico e' aggiornata all'ultima versione disponibile sul server.\")\n  }\n  \n}\n\n",
       "regex": true,
       "is_script": true,
       "class": "Ident",
@@ -3338,7 +3339,7 @@
     {
       "pattern": "^l(o|$)(o|$)k{0,1} ?(.*)$",
       "id": "look",
-      "value": "if (classEnabled(\"Ident\")) toggleTrigger(\"usciteVisibili\", true);\nthis.Mobs = \"\"\nsend(\"~look\" + (($3) ? (\" \" + ($3)) : \"\"))",
+      "value": "if (classEnabled(\"Ident\") && !($3)) toggleTrigger(\"usciteVisibili\", true);\nthis.Mobs = \"\"\nsend(\"~look\" + (($3) ? (\" \" + ($3)) : \"\"))",
       "regex": true,
       "is_script": true,
       "class": "",
