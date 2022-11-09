@@ -1,6 +1,6 @@
 {
-  "version": 20,
-  "versionMessage": "Correzioni script per gli identify",
+  "version": 21,
+  "versionMessage": "Correzioni script per memorize",
   "requiresClientMajor": 1,
   "requiresClientMinor": 3,
   "requiresClientRevision": 3,
@@ -2724,7 +2724,7 @@
     {
       "pattern": "finememorize",
       "id": "",
-      "value": "if (this.TSPosizione!=\"In piedi\" && this.finito_memmare = true) \n{\n  send(\"stand\")\n}\nthis.finito_memmare = false;\nif (!this.memorizing) return;\nif (this.spellMemmati) {\n  for\t(let s of Object.keys(this.memorizing)) {\n    if (!this.spellMemmati[s]) this.spellMemmati[s]=0;\n    this.spellMemmati[s] += this.memorizing[s];\n  }\n}\nthis.memorizing=null;",
+      "value": "if (this.TSPosizione!=\"In piedi\" && this.finito_memmare == true) \n{\n  send(\"stand\")\n}\nthis.finito_memmare = false;\nif (!this.memorizing) return;\nif (this.spellMemmati) {\n  for\t(let s of Object.keys(this.memorizing)) {\n    if (!this.spellMemmati[s]) this.spellMemmati[s]=0;\n    this.spellMemmati[s] += this.memorizing[s];\n  }\n}\nthis.memorizing=null;",
       "regex": false,
       "is_script": true,
       "class": "sorcerer",
@@ -2798,7 +2798,8 @@
       "class": "",
       "enabled": true,
       "is_prompt": false,
-      "shortcut": ""
+      "shortcut": "",
+      "script": null
     },
     {
       "pattern": "sancaAutosanc",
