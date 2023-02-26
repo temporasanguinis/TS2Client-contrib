@@ -1,9 +1,9 @@
 {
-  "version": 26,
-  "versionMessage": "mapper remapping",
+  "version": 27,
+  "versionMessage": "autogard, dado e bugfixes",
   "requiresClientMajor": 1,
   "requiresClientMinor": 3,
-  "requiresClientRevision": 8,
+  "requiresClientRevision": 9,
   "text-color": "green-on-black",
   "wrap-lines": true,
   "utf8Enabled": false,
@@ -159,14 +159,6 @@
         },
         {
           "type": "VariableChanged",
-          "condition": "TSRoom",
-          "id": "",
-          "value": "this.pauseAutocleric = false;\nthis.preventAntispalm = false;\nsetTimeout(()=>send(\"onroomenter \" + this.TSRoom),0)\ndelay(\"aspettomapper\", 1, () => {\n  if (mapper.current) {\n      send(\"onroomenter \" + mapper.current.id)\n  }\n})",
-          "class": "",
-          "enabled": true
-        },
-        {
-          "type": "VariableChanged",
           "condition": "Mobs,TSLag",
           "id": "",
           "value": "delay(\"mobchanged\", 20, ()=>{\n  if (this.Mobs && this.TSLag != \"+\") {\n      send(\"autokillcheck\")\n  }\n});",
@@ -179,6 +171,14 @@
           "id": "",
           "value": "print(\"Sei a: '\" + this.RoomName + \"', Vnum: \"+this.TSRoom);",
           "class": "debug",
+          "enabled": true
+        },
+        {
+          "type": "VariableChanged",
+          "condition": "TSRoom",
+          "id": "",
+          "value": "this.pauseAutocleric = false;\nthis.preventAntispalm = false;\nif (this.temp_dice)\n  delete this.temp_dice;\ntoggleTrigger(\"dice\", false);\nsetTimeout(()=>send(\"onroomenter \" + this.TSRoom),0)\ndelay(\"aspettomapper\", 1, () => {\n  if (mapper.current) {\n      send(\"onroomenter \" + mapper.current.id)\n  }\n})",
+          "class": "",
           "enabled": true
         }
       ]
@@ -351,12 +351,13 @@
     {
       "pattern": "^(.*) ti ordina '(.*)'",
       "id": "order",
-      "value": "if (this.isCapogruppo(match[1]) && this.autoorder) {\n  this.parlaStato = true;\n    send(match[2]);\n  this.parlaStato = this.afk;\n}",
+      "value": "if (this.isCapogruppo(match[1]) && this.autoorder) {\n  this.parlaStato = true;\n    send(\"followorder \" + match[2]);\n  this.parlaStato = this.afk;\n}",
       "regex": true,
       "is_script": true,
       "class": "autoorder",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -384,12 +385,13 @@
     {
       "pattern": "^\\[(.+)\\] dice al gruppo '(\\w+)\\:(.+)'",
       "id": "orderGt",
-      "value": "if (this.autoorder && this.isCapogruppo(match[1]) &&\n    (match[2] == \"tutti\" || this.TSPersonaggio.toLowerCase().indexOf(match[2].toLowerCase())==0)) {\nsend(match[3].trim());\n}",
+      "value": "if (this.autoorder && this.isCapogruppo(match[1]) &&\n    (match[2] == \"tutti\" || this.TSPersonaggio.toLowerCase().indexOf(match[2].toLowerCase())==0)) {\n  this.parlaStato = true;\n  send(\"followorder \"+match[3].trim());\n  this.parlaStato = this.afk;\n}",
       "regex": true,
       "is_script": true,
       "class": "order",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -406,12 +408,13 @@
     {
       "pattern": "^(La Luce Divina smette di illuminarti|La Natura smette di proteggerti)",
       "id": "triggerSelfsanc",
-      "value": "if (this.selfsanc && (this.healtype==\"C\" || this.TSSettore!=\"Chiuso\")) {\n   setTimeout(()=>{\n    if (this.TSSpells.toLowerCase().indexOf(\"s\") != -1) return;\n    if (this.healtype==\"C\" && (!this.casttype||this.casttype==\"C\") && !this.canBash && !this.canStab && this.pgInGruppo()>1) {\n      send(\"pray gard\");\n    } else {\n  \t\tsend(\"sanc\");\n    }\n  }, 1000);\n}",
+      "value": "if (this.selfsanc && (this.healtype==\"C\" || this.TSSettore!=\"Chiuso\")) {\n   setTimeout(()=>{\n    if (this.TSSpells.toLowerCase().indexOf(\"s\") != -1) return;\n    if (this.healtype==\"C\" && (!this.casttype||this.casttype==\"C\") && !this.canBash && !this.canStab && this.pgInGruppo()?.length>1) {\n      send(\"pray gard\");\n    } else {\n  \t\tsend(\"sanc\");\n    }\n  }, 1000);\n}",
       "regex": true,
       "is_script": true,
       "class": "selfsanc",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -518,7 +521,7 @@
     {
       "pattern": "^(Con una rapida mossa della sua arma, (.+) colpisce con decisione il tuo braccio|(.+) esegue un rapido calcio, che va a colpire la tua mano con estrema precisione)",
       "id": "",
-      "value": "send(\"wie \" + this.ultimaArma);",
+      "value": "if (this.ultimaArma == \"null\") {\n  this.ultimaArma = null;\n}\nif (!this.ultimaArma && this.armaPrimaria) {\n  const armi = [this.armaBlunt,this.armaSlash,this.armaPierce]\n  for (let arma of armi) {\n    print(arma)\n    if (arma && arma != this.armaPrimaria) send(\"~wie \" + arma)\n  }\n  send(\"wield \" + this.armaPrimaria)\n} else {\n  send(\"wie \" + this.ultimaArma);\n}",
       "regex": true,
       "is_script": true,
       "class": "combat",
@@ -1385,7 +1388,7 @@
     {
       "pattern": "^Il tuo sangue si raggela non appena senti il grido di morte di (.n paladino|.n arciere|.n'inquisitore|.no scudiero|.n mago|.'Arcangelo Remiel|.'Arcangelo Gabriel|.'Arcangelo Uriel|.'Arcangelo Raphael|.'Arcangelo Michael|.'Arcangelo Selaphiel|.'Arcangelo Remiel|.'Arcangelo Samuel)!",
       "id": "",
-      "value": "let lab = window.lab;\nif (lab == undefined) {return;}\n\nlet incrementa = (mob,coeff) => {\n\tlab[mob] += 1;\n    if ((lab[mob]>coeff*2) && (lab.lab_multi<3)) {\n      send(\"setlab 3\");\n    } else if ((lab[mob]>coeff) && (lab.lab_multi<2)) {\n      send(\"setlab 2\");\n    }    \n    print(\"Lab kill: \" + match[1] + \" (\" + lab[mob] + \")\");\n}\n\nif (match[1].toLowerCase().search(\"arciere\")>-1) {incrementa(\"arcieri\", 30);}\nif (match[1].toLowerCase().search(\"scudiero\")>-1) {incrementa(\"scudieri\", 10);}\nif (match[1].toLowerCase().search(\"paladino\")>-1) {incrementa(\"paladini\", 5);}\nif (match[1].toLowerCase().search(\"inquisitore\")>-1) {incrementa(\"inquisitori\", 8);}\nif (match[1].toLowerCase().search(\"mago\")>-1) {incrementa(\"maghi\", 6);}\nif (match[1].toLowerCase().search(\"arcangelo\")>-1) {incrementa(\"arcangeli\", 7);}\n\n//console.log(lab);\n\n",
+      "value": "let lab = window.lab;\nif (lab == undefined) {return;}\n\nlet incrementa = (mob,coeff) => {\n\tlab[mob] += 1;\n    if ((lab[mob]>coeff*2) && (lab.lab_multi<3)) {\n      send(\"setlab 3\");\n    } else if ((lab[mob]>coeff) && (lab.lab_multi<2)) {\n      send(\"setlab 2\");\n    }    \n    print(\"Lab kill: \" + match[1] + \" (\" + lab[mob] + \")\");\n}\n\nif (match[1].toLowerCase().search(\"arciere\")>-1) {incrementa(\"arcieri\", 30);}\nelse if (match[1].toLowerCase().search(\"scudiero\")>-1) {incrementa(\"scudieri\", 10);}\nelse if (match[1].toLowerCase().search(\"paladino\")>-1) {incrementa(\"paladini\", 5);}\nelse if (match[1].toLowerCase().search(\"inquisitore\")>-1) {incrementa(\"inquisitori\", 8);}\nelse if (match[1].toLowerCase().search(\"mago\")>-1) {incrementa(\"maghi\", 6);}\nelse if (match[1].toLowerCase().search(\"arcangelo\")>-1) {\n  incrementa(\"arcangeli\", 7);\n  if (this.isCapogruppo())\n    send(\"get chiave arcangelo\")\n}\n\n//console.log(lab);\n\n",
       "regex": true,
       "is_script": true,
       "class": "zone:157",
@@ -1425,6 +1428,54 @@
       "regex": false,
       "is_script": true,
       "class": "zone:157",
+      "enabled": true,
+      "is_prompt": false,
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "pattern": "^(\\S+).* tira un dado a 100 facce\\.\\.\\.$",
+      "id": "dice",
+      "value": "if (!this.temp_dice) {\n  this.temp_dice = {\n  launcher: \"\",\n  results: {}\n  }\n};\nif (match[1] in this.temp_dice.results) {\n  //send(\"gt ATTENZIONE: \" + match[1] + \" ha gia' tirato\");\n  sub(\"dado a 100 facce...\",\"dado a 100 facce...\" + color(\" ( lancio multiplo scartato )\", \"darkgray\"))\n} else {\n  this.temp_dice.launcher = match[1];\n  toggleTrigger(\"dice-risultato\", true);\n}",
+      "regex": true,
+      "is_script": true,
+      "class": "dice",
+      "enabled": false,
+      "is_prompt": false,
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "pattern": "^Il risultato e' (\\d+)\\.$",
+      "id": "dice-risultato",
+      "value": "this.temp_dice.results[this.temp_dice.launcher] = Number(match[1]);\n\nlet maxresult = 0;\nlet winner = \"\";\nfor (const [name, result] of Object.entries(temp_dice.results)) {\n  //print(name + \"=\" + result);\n  if (result > maxresult) {\n    maxresult = result;\n    winner = name;\n  } else if (result == maxresult) {\n    winner = winner + \",\" + name;\n  }\n}\n\nlet answ = \"\";\nif (winner.search(\",\")>-1) {\n  answ = color(\"Pareggio tra \", \"lightgray\")\n} else {\n  answ = color(\"Sta vincendo \", \"lightgray\")\n}\nansw +=  color(winner,\"lightblue\") + color(\" con \",\"lightgray\") + color(maxresult, \"yellow\");\n\nconst s = \"Il risultato e' \" + match[1] + \".\";\nsub(s, s + \"   < \" + color(answ,\"red\") + \" > \");\nNotification.Show(\"Vince: \" + color(winner,\"lightgreen\") + \": \" + color(maxresult, \"yellow\"), false, true, 3000, true)\ntoggleTrigger(\"dice-risultato\", false);\n",
+      "regex": true,
+      "is_script": true,
+      "class": "dice",
+      "enabled": false,
+      "is_prompt": false,
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "pattern": "\\[(\\S+).*\\] dice al gruppo \\'dad(?:a|ate|are|o)|(Tu) dici al gruppo \\'dad(?:a|ate|are|o)",
+      "id": "",
+      "value": "if ( (match[1] && this.isCapogruppo(match[1])) ||\n     (match[2]==\"Tu\" && this.isCapogruppo(this.TSPersonaggio)) ) {\n  this.temp_dice = {\n    launcher: \"\",\n    results: {}\n  }\n  toggleTrigger(\"dice\", true);\n  Notification.Show(color(\"Il capogruppo ha chiesto di tirare il dado!\",\"lightgreen\"), true, false, 3000, true, 1.0, true)\n}",
+      "regex": true,
+      "is_script": true,
+      "class": "dice-init",
+      "enabled": true,
+      "is_prompt": false,
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "pattern": "Un enorme Monolito che irradia potenza con dei segni",
+      "id": "",
+      "value": "push monolito",
+      "regex": false,
+      "is_script": false,
+      "class": "zone:204",
       "enabled": true,
       "is_prompt": false,
       "shortcut": "",
@@ -2030,8 +2081,7 @@
       "class": "config",
       "enabled": true,
       "is_prompt": false,
-      "shortcut": "",
-      "script": null
+      "shortcut": ""
     },
     {
       "pattern": "^selfshield(.*)",
@@ -2047,12 +2097,13 @@
     {
       "pattern": "^selfsanc(.*)",
       "id": "",
-      "value": "const orig = this.selfsanc;\nthis.selfsanc = !this.selfsanc;\n\nif (match && match[1] != undefined && match[1].trim().length) {\n\tthis.selfsanc = (match[1].trim() == \"true\" || match[1].trim() == \"on\");\n}\n\ntoggleClass(\"selfsanc\", this.selfsanc);\nlet str = \"Selfsanc: \"+ (this.selfsanc ? \"ABILITATO\" : \"DISABILITATO\");\nif (orig != this.selfsanc) this.diciStatus(str);",
+      "value": "const orig = this.selfsanc;\nthis.selfsanc = !this.selfsanc;\n\nif (match && match[1] != undefined && match[1].trim().length) {\n\tthis.selfsanc = (match[1].trim() == \"true\" || match[1].trim() == \"on\");\n}\n\ntoggleClass(\"selfsanc\", this.selfsanc);\nlet tipoSanc = \"Selfsanc\"\nif (this.healtype==\"C\" && (!this.casttype||this.casttype==\"C\") && !this.canBash && !this.canStab && this.pgInGruppo()?.length>1) {\n  tipoSanc = \"AutoGard\";\n}\nlet str = tipoSanc + \": \"+ (this.selfsanc ? \"ABILITATO\" : \"DISABILITATO\");\nif (orig != this.selfsanc) this.diciStatus(str);",
       "regex": true,
       "is_script": true,
       "class": "",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -2135,12 +2186,13 @@
     {
       "pattern": "^asanc ?(.+)?$",
       "id": "",
-      "value": "let orig = this.autosanc;\nthis.autosanc = !(this.autosanc||false);\nlet pg = (match[1]||\"\").trim();\nif (pg == \"off\" || pg == \"false\") {\n  this.autosanc = false;\n  this.listaAutosanc = [];\n  toggleClass(\"autosanc\", this.autosanc);\n  if (orig != this.autosanc) this.diciStatus(\"Autosanc: \" + (this.autosanc ? (this.listaAutosanc.length ? this.listaAutosanc : [\"[Nessuno]\"]).join(\",\") : \"DISABILITATO\"))\n  return;\n}\nif (pg) {\n  pg = this.titleCase(pg);\n  this.autosanc = true;\n  orig = null;\n}\nthis.listaAutosanc = this.listaAutosanc || [];\nif (pg) {\n  let index = this.listaAutosanc.indexOf(pg);\n  if (index>-1) {\n    this.listaAutosanc.splice(index,1);\n  } else {\n    this.listaAutosanc.push(pg);\n  }\n}\ntoggleClass(\"autosanc\", this.autosanc);\nlet str = \"Autosanc: \" + (this.autosanc ? (this.listaAutosanc.length ? this.listaAutosanc : [\"[Nessuno]\"]).join(\",\") : \"DISABILITATO\");\nif (this.autosanc && !this.listaAutosanc.length &&\n   !this.canBash && !this.canStab && this.casttype==\"C\") {\n  str = \"AutoGard: ON\";\n}\nif (orig != this.autosanc) this.diciStatus(str)",
+      "value": "let orig = this.autosanc;\nthis.autosanc = !(this.autosanc||false);\nlet pg = (match[1]||\"\").trim();\nif (pg == \"off\" || pg == \"false\") {\n  this.autosanc = false;\n  this.listaAutosanc = [];\n  toggleClass(\"autosanc\", this.autosanc);\n  if (orig != this.autosanc) this.diciStatus(\"Autosanc: \" + (this.autosanc ? (this.listaAutosanc.length ? this.listaAutosanc : [\"[Nessuno]\"]).join(\",\") : \"DISABILITATO\"))\n  return;\n}\nif (pg) {\n  pg = this.titleCase(pg);\n  this.autosanc = true;\n  orig = null;\n}\nthis.listaAutosanc = this.listaAutosanc || [];\nif (pg) {\n  let index = this.listaAutosanc.indexOf(pg);\n  if (index>-1) {\n    this.listaAutosanc.splice(index,1);\n  } else {\n    this.listaAutosanc.push(pg);\n  }\n}\ntoggleClass(\"autosanc\", this.autosanc);\nlet str = \"Autosanc: \" + (this.autosanc ? (this.listaAutosanc.length ? this.listaAutosanc : [\"[Nessuno]\"]).join(\",\") : \"DISABILITATO\");\nif (orig != this.autosanc) this.diciStatus(str)",
       "regex": true,
       "is_script": true,
       "class": "",
       "enabled": true,
       "is_prompt": false,
+      "shortcut": "",
       "script": null
     },
     {
@@ -2773,7 +2825,7 @@
     {
       "pattern": "mining",
       "id": "",
-      "value": "if (!this.holdItem) {\n  print(\"Non hai configurato l'oggetto che hai tenuto. Rifai il setup.\");\n  return;\n}\nif (this.ultimaArma) {\n\tsend(`rem ${this.ultimaArma}`)\n}\nsend(`rem ${this.holdItem}\ngb piccone\n~hold piccone\n~wield piccone\nmine\nrem piccone\npb piccone\n~wield ${this.ultimaArma}\n~hold ${this.holdItem}`);",
+      "value": "if (!this.holdItem) {\n  print(\"Non hai configurato l'oggetto che hai tenuto. Rifai il setup.\");\n  return;\n}\nif (this.ultimaArma) {\n\tsend(`rem ${this.ultimaArma}`)\n} else {\n  send(this.armaPrimaria)\n}\nsend(`rem ${this.holdItem}\ngb piccone\n~hold piccone\n~wield piccone\nmine\nrem piccone\npb piccone\n~wield ${this.ultimaArma}\n~hold ${this.holdItem}`);",
       "regex": false,
       "is_script": true,
       "class": "util",
@@ -2922,7 +2974,7 @@
     {
       "pattern": "vai",
       "id": "",
-      "value": "console.log(\"vai \" + $1)\nif (!$1 && !this.searchRooms) {\n  const showVai = () => {\n    for (const v of [...mapper.shortNameToRoom].sort((a,b)=>{\n      const nameA = a[0].toUpperCase(); // ignore upper and lowercase\n      const nameB = b[0].toUpperCase(); // ignore upper and lowercase\n      if (nameA < nameB) {\n        return -1;\n      }\n      if (nameA > nameB) {\n        return 1;\n      }\n\n      // names must be equal\n      return 0;\n    })) {\n    \tprint(v[0] + \" -> (\" + v[1].id + \") \" + v[1].name)\n    }\n  };\n  print(\"Non hai ricerche precedenti. Il comando vai senza parametri scorre tra le room dell'ultima ricerca.\")\n  print(\"Se vuoi vedere tutte le key disponibili al comando VAI premi \"+link(\"QUI\",showVai)+\".\")\n  print(\"Puoi usare anche VAI numero.\")\n  return\n}\n  if ($1 && !isNaN($1)) {\n    mapper.walkToId($1);\n    this.walkingToId = $1\n  }\n  else if (!$1 && this.searchRooms) {\n    if (typeof this.searchRooms !=\"function\" || !this.searchRooms().length) {\n      print(\"Non c'e' nessuna altra room del 'cerca' da visitare.\")\n      this.searchRooms = null;\n      return;\n    }\n    let rNext = this.searchRooms()[0]\n    if (rNext.id == mapper.current?.id) {\n        this.searchRooms().splice(0,1)\n        rNext = this.searchRooms()[0]\n    }\n    if (rNext) {\n      print(\"Continuo alla prossima room dell'ultimo cerca: '\"+rNext.name+\"'.\")\n      this.searchRooms().splice(0,1)\n      send(\"vai \"+rNext.id)\n    }\n  }\n  else if (!!$1) {\n    mapper.walkToRoomShortName($1);\n  }\n//})",
+      "value": "console.log(\"vai \" + $1)\ndeleteWindow(\"Ricerca locazioni\");\nif (!$1 && !this.searchRooms) {\n  const showVai = () => {\n    for (const v of [...mapper.shortNameToRoom].sort((a,b)=>{\n      const nameA = a[0].toUpperCase(); // ignore upper and lowercase\n      const nameB = b[0].toUpperCase(); // ignore upper and lowercase\n      if (nameA < nameB) {\n        return -1;\n      }\n      if (nameA > nameB) {\n        return 1;\n      }\n\n      // names must be equal\n      return 0;\n    })) {\n    \tprint(v[0] + \" -> (\" + v[1].id + \") \" + v[1].name)\n    }\n  };\n  print(\"Non hai ricerche precedenti. Il comando vai senza parametri scorre tra le room dell'ultima ricerca.\")\n  print(\"Se vuoi vedere tutte le key disponibili al comando VAI premi \"+link(\"QUI\",showVai)+\".\")\n  print(\"Puoi usare anche VAI numero.\")\n  return\n}\n  if ($1 && !isNaN($1)) {\n    mapper.walkToId($1);\n    this.walkingToId = $1\n  }\n  else if (!$1 && this.searchRooms) {\n    if (typeof this.searchRooms !=\"function\" || !this.searchRooms().length) {\n      print(\"Non c'e' nessuna altra room del 'cerca' da visitare.\")\n      this.searchRooms = null;\n      return;\n    }\n    let rNext = this.searchRooms()[0]\n    if (rNext.id == mapper.current?.id) {\n        this.searchRooms().splice(0,1)\n        rNext = this.searchRooms()[0]\n    }\n    if (rNext) {\n      print(\"Continuo alla prossima room dell'ultimo cerca: '\"+rNext.name+\"'.\")\n      this.searchRooms().splice(0,1)\n      send(\"vai \"+rNext.id)\n    }\n  }\n  else if (!!$1) {\n    mapper.walkToRoomShortName($1);\n  }\n//})",
       "regex": false,
       "is_script": true,
       "class": "mapper",
@@ -3426,7 +3478,7 @@
     {
       "pattern": "^identimport( privato$| pubblico$| online$| purge$|$)",
       "id": "",
-      "value": "let util = window.dbIdentUtil;\nif (!util) {\n  send(\"ident_init\")\n}\nutil = window.dbIdentUtil;\n\nconst database = match[1].trim() || \"privato\";\n\n\nasync function importPublicoObj(objparsed) {\n  util.db.ogglistPubl = objparsed.data;\n  util.db.dbinfo = objparsed.dbinfo;  \n  util.db.fields = objparsed.fields;\n  await util.save(true);\n}\n\nasync function importPublico(text) {\n  let objparsed = JSON.parse(text);\n  await importPublicoObj(objparsed)\n}\n\nasync function importPrivato(text) {\n  let objparsed = JSON.parse(text);\n  util.db.ogglistPriv = objparsed.data;\n  await util.save(false);\n}\n\n\nfunction importFromFile(callback) {\n    if (!callback) return;\n    let inp = document.createElement(\"input\");\n    inp.type = \"file\";\n    inp.style.visibility = \"hidden\";\n\n    inp.addEventListener(\"change\", (e) => {\n        let file = e.target.files[0];\n        if (!file) {\n            return;\n        }\n\n        let reader = new FileReader();\n        reader.onload = (e1) => {\n            let text = e1.target.result;\n            callback(text)\n        };\n        reader.readAsText(file);\n\n    });\n\n    document.body.appendChild(inp);\n    inp.click();\n    document.body.removeChild(inp);\n}\n\nif (database == \"pubblico\") {\n  importFromFile(importPublico);\n} else if (database == \"privato\") {\n  importFromFile(importPrivato);\n} else if (database == \"purge\") {\n  util.db.ogglistPubl = [];\n  util.db.ogglistPriv = [];\n  util.db.dbinfo = {};  \n  util.db.fields = [];\n  util.save(true);\n  util.save(false);\n} else if (database == \"online\") {\n  const prefix = window.location.hostname.indexOf(\"localhost\")>-1 ? \"https://www.temporasanguinis.it\" : \"\"\n  //print(prefix + \"/client/identDbPublicVersion.json\")\n  const res1 = await fetch(prefix + \"/client/identDbPublicVersion.json\")\n  const verData = await res1.json();\n\n  if (verData.dbinfo.ver > (util.db.dbinfo?.ver || 0)) {\n    // versione nuova online, aggiorniamo il pubblico\n    \n  \tconst res2 = await fetch(prefix + \"/client/identDbPublic.json\")\n  \tconst dbObj = await res2.json();\n    importPublicoObj(dbObj)\n\tprint(\"Eseguo aggiornamento del DB Identify pubblico a v\" + verData.dbinfo.ver)\n  \n  } else {\n    //print(\"La versione del DB Identify pubblico e' aggiornata all'ultima versione disponibile sul server.\")\n  }\n  \n}\n\n",
+      "value": "let util = window.dbIdentUtil;\nif (!util) {\n  send(\"ident_init\")\n}\nutil = window.dbIdentUtil;\n\nconst database = match[1].trim() || \"privato\";\n\n\nasync function importPublicoObj(objparsed) {\n  util.db.ogglistPubl = objparsed.data;\n  util.db.dbinfo = objparsed.dbinfo;  \n  util.db.fields = objparsed.fields;\n  await util.save(true);\n}\n\nasync function importPublico(text) {\n  let objparsed = JSON.parse(text);\n  await importPublicoObj(objparsed)\n}\n\nasync function importPrivato(text) {\n  let objparsed = JSON.parse(text);\n  util.db.ogglistPriv = objparsed.data;\n  await util.save(false);\n}\n\n\nfunction importFromFile(callback) {\n    if (!callback) return;\n    let inp = document.createElement(\"input\");\n    inp.type = \"file\";\n    inp.style.visibility = \"hidden\";\n\n    inp.addEventListener(\"change\", (e) => {\n        let file = e.target.files[0];\n        if (!file) {\n            return;\n        }\n\n        let reader = new FileReader();\n        reader.onload = (e1) => {\n            let text = e1.target.result;\n            callback(text)\n        };\n        reader.readAsText(file);\n\n    });\n\n    document.body.appendChild(inp);\n    inp.click();\n    document.body.removeChild(inp);\n}\n\nif (database == \"pubblico\") {\n  importFromFile(importPublico);\n} else if (database == \"privato\") {\n  importFromFile(importPrivato);\n} else if (database == \"purge\") {\n  util.db.ogglistPubl = [];\n  util.db.ogglistPriv = [];\n  util.db.dbinfo = {};  \n  util.db.fields = [];\n  util.save(true);\n  util.save(false);\n} else if (database == \"online\") {\n  const prefix = window.location.hostname.indexOf(\"localhost\")>-1 ? \"https://www.temporasanguinis.it\" : \"\"\n  //print(prefix + \"/client/identDbPublicVersion.json\")\n  const res1 = await fetch(prefix + \"/client/identDbPublicVersion.json?rng=\"+Math.random())\n  const verData = await res1.json();\n\n  if (verData.dbinfo.ver > (util.db.dbinfo?.ver || 0)) {\n    // versione nuova online, aggiorniamo il pubblico\n    \n  \tconst res2 = await fetch(prefix + \"/client/identDbPublic.json?rng=\"+Math.random())\n  \tconst dbObj = await res2.json();\n    importPublicoObj(dbObj)\n\tprint(\"Eseguo aggiornamento del DB Identify pubblico a v\" + verData.dbinfo.ver)\n  \n  } else {\n    //print(\"La versione del DB Identify pubblico e' aggiornata all'ultima versione disponibile sul server.\")\n  }\n  \n}\n\n",
       "regex": true,
       "is_script": true,
       "class": "Ident",
@@ -3534,7 +3586,7 @@
     {
       "pattern": "^ident(Dev|) ?(.*)$",
       "id": "",
-      "value": "var util = window.dbIdentUtil;\nconst isDev = (match[1] === \"Dev\")\nconst searchKey = match[2]\n\nif (match[2]==\"\") {\n  print(color(\"HELP COMANDI WEBCLIENT PER IDENT\",\"white\"));\n  print(color(\"\\n\" \n             +\"Sono disponibili 2 archivi di oggetti:\\n\"\n             +\"* uno pubblico non modificabile che viene scaricato dal server\\n\"\n             +\"* uno privato che può essere popolato dai giocatori\\n\"\n             +\"\\n\"\n             +\"Comandi per la gestione degli identify:\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"RICERCA: ident key1|key2|...|keyn\\n\",\"yellow\"));\n  print(color(\"Restituisce l'identify o l'elenco degli oggetti che hanno \"\n             +\"nel testo dell'identify tutte le parole indicate nelle chiavi.\\n\"\n             +\"Esempio: ident spada del sole|slayer\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"AGGIUNTA DI UN IDENTIFY:\",\"yellow\"));\n  print(color(\"Dopo l'identify di un oggetto compariranno alcune scritte per informare se \"\n             +\"l'oggetto è già nell'archivio oppure no.\\n\"\n             +\"In questo secondo caso cliccando su \\\"Click per aggiungerlo\\\" l'identify verrà aggiunto \"\n             +\"all'archivio privato e gli sarà assegnato un identificativo del tipo Priv#\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"AGGIUNTA/MODIFICA DELLA PROVENIENZA: setprovenienza ID \\\"testo libero\\\"\",\"yellow\"));\n  print(color(\"Ad ogni oggetto si possono aggiungere informazioni utili (normalmente la provenienza)\\n\"\n             +\"- ID e' l'identificativo dell'oggetto nell'archivio pubblico o privato\\n\"\n             +\"- testo libero, racchiuso tra virgolette e' il testo che si vuole aggiungere \"\n             +\"solitamente nella forma Area - Mob Locazione Altre info\\n\"\n             +\"Esempio: setprovenienza Priv5 \\\"Blackmouth - Alchimista teneborsa (10781)\\\"\",\"lightgray\")); \n  print(color(\"EXTRA: setprovenienza \\\"testo libero\\\"\",\"yellow\"));\n  print(color(\"setprovenienza senza indicare l'ID agisce sull'ultimo oggetto che e' stato aggiunto al database\\n\",\"lightgray\"));\n  print(color(\"EXTRA: setprovenienza\",\"yellow\"));\n  print(color(\"setprovenienza senza indicare nulla deve essere lanciato nella locazione dove si \"\n             +\"raccoglie l'oggetto appena dopo averlo preso.\\n\"\n             +\"Apre una piccola interfaccia per facilitare la compilazione della provenienza\\n\"\n             +\"\\n\",\"lightgray\")); \n  print(color(\"CANCELLAZIONE DI UN IDENTIFY: identdel Priv#\",\"yellow\"));\n  print(color(\"Rimuove dall'archivio privato l'oggetto con l'id indicato\\n\"\n             +\"Esempio: idendel Priv1\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"CANCELLAZIONE DELL'ARCHIVIO PRIVATO: identdel All\",\"yellow\"));\n  print(color(\"Svuota l'archivio privato. Tipicamente utile dopo una esportazione.\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"ESPORTAZIONE: identexport\",\"yellow\"));\n  print(color(\"Viene aperta una machera per salvare in locale sul proprio pc l'archivio privato.\\n\"\n             +\"\\n\",\"lightgray\"));   \n  print(color(\"IMPORTAZIONE: identimport\",\"yellow\"));\n  print(color(\"Viene aperta una maschera per scegliere dal proprio pc il file da utilizzare \"\n             +\"per popolare l'archivio privato\",\"lightgray\")); \n  return;\n}\n\n\nlet r;\nif (match[2].search(/^\\d+$|^Priv\\d+/)==0) {\n  r = [util.findID(searchKey)];\n} else {\n  r = util.search(searchKey);\n}\n\nfunction buildIdentifyStr(ogg, dev) {\n  let out = (\"ID: \" + color(ogg[util.db.fieldsPos.ID],\"yellow\") + \"\\n\");\n  out += (ogg[util.db.fieldsPos.Identify] + \"\\n\");\n  out += (\"Provenienza: \" + ogg[util.db.fieldsPos.Provenienza] + \"\\n\");\n  \n  if (dev) {\n  \tout += \"Oggetto: \" + ogg[util.db.fieldsPos.Oggetto] + \"\\n\";\n  \tout += \"DescrizioneShort: \" + ogg[util.db.fieldsPos.DescrizioneShort] + \"\\n\";\n  \tout += \"DescrizioneLong: \" + ogg[util.db.fieldsPos.DescrizioneLong] + \"\\n\";    \n  \tout += \"Tipo: \" + ogg[util.db.fieldsPos.Tipo] + \"\\n\";\n  \tout += \"PosizioneIndossabile: \" + ogg[util.db.fieldsPos.PosizioneIndossabile] + \"\\n\";\n  \tout += \"Proprieta: \" + ogg[util.db.fieldsPos.Proprieta] + \"\\n\";\n  \tout += \"Peso: \" + ogg[util.db.fieldsPos.Peso] + \"\\n\";\n  \tout += \"Valore: \" + ogg[util.db.fieldsPos.Valore] + \"\\n\";\n  \tout += \"Rent: \" + ogg[util.db.fieldsPos.Rent] + \"\\n\";   \n  \tout += \"Rare: \" + ogg[util.db.fieldsPos.Rare] + \"\\n\";\n  \tout += \"NoRent: \" + ogg[util.db.fieldsPos.NoRent] + \"\\n\";\n  \tout += \"DannoArma: \" + ogg[util.db.fieldsPos.DannoArma] + \"\\n\";\n    out += \"Danno: \" + ogg[util.db.fieldsPos.Danno] + \"\\n\";\n  \tout += \"SP: \" + ogg[util.db.fieldsPos.SP] + \"\\n\";\n  \tout += \"HP: \" + ogg[util.db.fieldsPos.HP] + \"\\n\";\n  \tout += \"Mana: \" + ogg[util.db.fieldsPos.Mana] + \"\\n\";\n  \tout += \"Affect1Tipo: \" + ogg[util.db.fieldsPos.Affect1Tipo] + \"\\n\";\n  \tout += \"Affect1Valore: \" + ogg[util.db.fieldsPos.Affect1Valore] + \"\\n\";\n  \tout += \"Affect2Tipo: \" + ogg[util.db.fieldsPos.Affect2Tipo] + \"\\n\";\n  \tout += \"Affect2Valore: \" + ogg[util.db.fieldsPos.Affect2Valore] + \"\\n\";\n  \tout += \"Affect3Tipo: \" + ogg[util.db.fieldsPos.Affect3Tipo] + \"\\n\";\n  \tout += \"Affect3Valore: \" + ogg[util.db.fieldsPos.Affect3Valore] + \"\\n\";\n  \tout += \"Affect4Tipo: \" + ogg[util.db.fieldsPos.Affect4Tipo] + \"\\n\";\n  \tout += \"Affect4Valore: \" + ogg[util.db.fieldsPos.Affect4Valore] + \"\\n\";\n  \tout += \"Affect5Tipo: \" + ogg[util.db.fieldsPos.Affect5Tipo] + \"\\n\";\n  \tout += \"Affect5Valore: \" + ogg[util.db.fieldsPos.Affect5Valore] + \"\\n\";\n \n  }\n  out += \"\\n\";\n  return out;\n}\n\nif (r.length == 0) { //Nessun oggetto trovato => notifica\n  print(\"Nessun oggetto trovato con i criteri richiesti\");\n} else if (r.length == 1) { //1 solo oggetto trovato => mando direttamente a screen principale\n  print(buildIdentifyStr(r[0], isDev));\n} else { //Più oggetti trovati => Mando a window specifica\n  \n  pageContent(\"Identify\", (pageIndex, pageSize) => {\n    let total = 0\n    let data = r;\n    if (data && (total = data.length))\n    {\n      for (let i = pageIndex * pageSize; i < (pageIndex+1) * pageSize && i < total; i++) {\n        let line = link(color(data[i][util.db.fieldsPos.ID], \"yellow\", null, false, true) + color(\" \", \"lightgray\") + color(data[i][util.db.fieldsPos.Oggetto], \"yellow\", null, true), () => print(buildIdentifyStr(data[i], isDev)))\n        line += \"\\n \" + color(data[i][util.db.fieldsPos.DescrizioneShort], \"lightgray\")\n        print(line,\"Identify\")\n      }\n    } else {\n      print(color(\" Nessuno :(\",\"red\"), \"Ricerca locazioni\")\n    }\n    return total;\n  }, \"Oggetti trovati per: \"+color(searchKey,\"yellow\"), 0, 10, 450, 440)\n  \n}\n\n",
+      "value": "var util = window.dbIdentUtil;\nconst isDev = (match[1] === \"Dev\")\nconst searchKey = match[2]\n\nif (match[2]==\"\") {\n  print(color(\"HELP COMANDI WEBCLIENT PER IDENT\",\"white\"));\n  print(color(\"\\n\" \n             +\"Sono disponibili 2 archivi di oggetti:\\n\"\n             +\"* uno pubblico non modificabile che viene scaricato dal server\\n\"\n             +\"* uno privato che può essere popolato dai giocatori\\n\"\n             +\"\\n\"\n             +\"Comandi per la gestione degli identify:\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"RICERCA: ident key1|key2|...|keyn\\n\",\"yellow\"));\n  print(color(\"Restituisce l'identify o l'elenco degli oggetti che hanno \"\n             +\"nel testo dell'identify tutte le parole indicate nelle chiavi.\\n\"\n             +\"Esempio: ident spada del sole|slayer\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"AGGIUNTA DI UN IDENTIFY:\",\"yellow\"));\n  print(color(\"Dopo l'identify di un oggetto compariranno alcune scritte per informare se \"\n             +\"l'oggetto è già nell'archivio oppure no.\\n\"\n             +\"In questo secondo caso cliccando su \\\"Click per aggiungerlo\\\" l'identify verrà aggiunto \"\n             +\"all'archivio privato e gli sarà assegnato un identificativo del tipo Priv#\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"AGGIUNTA/MODIFICA DELLA PROVENIENZA: setprovenienza ID \\\"testo libero\\\"\",\"yellow\"));\n  print(color(\"Ad ogni oggetto si possono aggiungere informazioni utili (normalmente la provenienza)\\n\"\n             +\"- ID e' l'identificativo dell'oggetto nell'archivio pubblico o privato\\n\"\n             +\"- testo libero, racchiuso tra virgolette e' il testo che si vuole aggiungere \"\n             +\"solitamente nella forma Area - Mob Locazione Altre info\\n\"\n             +\"Esempio: setprovenienza Priv5 \\\"Blackmouth - Alchimista teneborsa (10781)\\\"\",\"lightgray\")); \n  print(color(\"EXTRA: setprovenienza \\\"testo libero\\\"\",\"yellow\"));\n  print(color(\"setprovenienza senza indicare l'ID agisce sull'ultimo oggetto che e' stato aggiunto al database\\n\",\"lightgray\"));\n  print(color(\"EXTRA: setprovenienza\",\"yellow\"));\n  print(color(\"setprovenienza senza indicare nulla deve essere lanciato nella locazione dove si \"\n             +\"raccoglie l'oggetto appena dopo averlo preso.\\n\"\n             +\"Apre una piccola interfaccia per facilitare la compilazione della provenienza\\n\"\n             +\"\\n\",\"lightgray\")); \n  print(color(\"CANCELLAZIONE DI UN IDENTIFY: identdel Priv#\",\"yellow\"));\n  print(color(\"Rimuove dall'archivio privato l'oggetto con l'id indicato\\n\"\n             +\"Esempio: idendel Priv1\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"CANCELLAZIONE DELL'ARCHIVIO PRIVATO: identdel All\",\"yellow\"));\n  print(color(\"Svuota l'archivio privato. Tipicamente utile dopo una esportazione.\\n\"\n             +\"\\n\",\"lightgray\"));\n  print(color(\"ESPORTAZIONE: identexport\",\"yellow\"));\n  print(color(\"Viene aperta una machera per salvare in locale sul proprio pc l'archivio privato.\\n\"\n             +\"\\n\",\"lightgray\"));   \n  print(color(\"IMPORTAZIONE: identimport\",\"yellow\"));\n  print(color(\"Viene aperta una maschera per scegliere dal proprio pc il file da utilizzare \"\n             +\"per popolare l'archivio privato\",\"lightgray\")); \n  return;\n}\n\n\nlet r;\nif (match[2].search(/^\\d+$|^Priv\\d+/)==0) {\n  r = [util.findID(searchKey)];\n} else {\n  r = util.search(searchKey);\n}\n\nfunction buildIdentifyStr(ogg, dev) {\n  let out = (\"ID: \" + color(ogg[util.db.fieldsPos.ID],\"yellow\") + \"\\n\");\n  out += (ogg[util.db.fieldsPos.Identify] + \"\\n\");\n  out += (\"Provenienza: \" + ogg[util.db.fieldsPos.Provenienza] + \"\\n\");\n  \n  if (dev) {\n  \tout += \"Oggetto: \" + ogg[util.db.fieldsPos.Oggetto] + \"\\n\";\n  \tout += \"DescrizioneShort: \" + ogg[util.db.fieldsPos.DescrizioneShort] + \"\\n\";\n  \tout += \"DescrizioneLong: \" + ogg[util.db.fieldsPos.DescrizioneLong] + \"\\n\";    \n  \tout += \"Tipo: \" + ogg[util.db.fieldsPos.Tipo] + \"\\n\";\n  \tout += \"PosizioneIndossabile: \" + ogg[util.db.fieldsPos.PosizioneIndossabile] + \"\\n\";\n  \tout += \"Proprieta: \" + ogg[util.db.fieldsPos.Proprieta] + \"\\n\";\n  \tout += \"Peso: \" + ogg[util.db.fieldsPos.Peso] + \"\\n\";\n  \tout += \"Valore: \" + ogg[util.db.fieldsPos.Valore] + \"\\n\";\n  \tout += \"Rent: \" + ogg[util.db.fieldsPos.Rent] + \"\\n\";   \n  \tout += \"Rare: \" + ogg[util.db.fieldsPos.Rare] + \"\\n\";\n  \tout += \"NoRent: \" + ogg[util.db.fieldsPos.NoRent] + \"\\n\";\n  \tout += \"DannoArma: \" + ogg[util.db.fieldsPos.DannoArma] + \"\\n\";\n    out += \"Danno: \" + ogg[util.db.fieldsPos.Danno] + \"\\n\";\n  \tout += \"SP: \" + ogg[util.db.fieldsPos.SP] + \"\\n\";\n  \tout += \"HP: \" + ogg[util.db.fieldsPos.HP] + \"\\n\";\n  \tout += \"Mana: \" + ogg[util.db.fieldsPos.Mana] + \"\\n\";\n  \tout += \"Affect1Tipo: \" + ogg[util.db.fieldsPos.Affect1Tipo] + \"\\n\";\n  \tout += \"Affect1Valore: \" + ogg[util.db.fieldsPos.Affect1Valore] + \"\\n\";\n  \tout += \"Affect2Tipo: \" + ogg[util.db.fieldsPos.Affect2Tipo] + \"\\n\";\n  \tout += \"Affect2Valore: \" + ogg[util.db.fieldsPos.Affect2Valore] + \"\\n\";\n  \tout += \"Affect3Tipo: \" + ogg[util.db.fieldsPos.Affect3Tipo] + \"\\n\";\n  \tout += \"Affect3Valore: \" + ogg[util.db.fieldsPos.Affect3Valore] + \"\\n\";\n  \tout += \"Affect4Tipo: \" + ogg[util.db.fieldsPos.Affect4Tipo] + \"\\n\";\n  \tout += \"Affect4Valore: \" + ogg[util.db.fieldsPos.Affect4Valore] + \"\\n\";\n  \tout += \"Affect5Tipo: \" + ogg[util.db.fieldsPos.Affect5Tipo] + \"\\n\";\n  \tout += \"Affect5Valore: \" + ogg[util.db.fieldsPos.Affect5Valore] + \"\\n\";\n \n  }\n  out += \"\\n\";\n  return out;\n}\n\nif (r.length == 0) { //Nessun oggetto trovato => notifica\n  print(\"Nessun oggetto trovato con i criteri richiesti\");\n} else if (r.length == 1) { //1 solo oggetto trovato => mando direttamente a screen principale\n  print(buildIdentifyStr(r[0], isDev));\n} else { //Più oggetti trovati => Mando a window specifica\n  \n  pageContent(\"Identify\", (pageIndex, pageSize) => {\n    let total = 0\n    let data = r;\n    if (data && (total = data.length))\n    {\n      for (let i = pageIndex * pageSize; i < (pageIndex+1) * pageSize && i < total; i++) {\n        let line = link(color(data[i][util.db.fieldsPos.ID], !data[i][util.db.fieldsPos.Provenienza]?\"yellow\":\"lighgreen\", null, false, true) + color(\" \", \"lightgray\") + color(data[i][util.db.fieldsPos.Oggetto], !data[i][util.db.fieldsPos.Provenienza]?\"yellow\":\"lighgreen\", null, true), () => print(buildIdentifyStr(data[i], isDev)))\n        line += \"\\n \" + color(data[i][util.db.fieldsPos.DescrizioneShort], \"lightgray\")\n        print(line,\"Identify\")\n      }\n    } else {\n      print(color(\" Nessuno :(\",\"red\"), \"Ricerca locazioni\")\n    }\n    return total;\n  }, \"Oggetti trovati per: \"+color(searchKey,\"yellow\"), 0, 10, 450, 440)\n  \n}\n\n",
       "regex": true,
       "is_script": true,
       "class": "Ident",
@@ -3638,6 +3690,18 @@
       "is_prompt": false,
       "shortcut": "",
       "script": null
+    },
+    {
+      "pattern": "followorder",
+      "id": "",
+      "value": "const order = ($1).toString()\nconst ordiniVietati = [\"trai\",\"pr\",\"alle\",\"wit\",\"de\",\"prel\",\"grid\",\"sh\",\"ot\",\"gos\",\"sa\",\"par\",\"di\",\"set\",\"pwp\",\"rpg\",\"tit\",\"quit\"]\nif (ordiniVietati.find((e) => order.toLowerCase() == e || order.toLowerCase().startsWith(e + \" \"))) {\n  this.parlaStato = true\n  send(\"sayStatus Ordine vietato\")\n  this.parlaStato = this.afk\n  return\n}\nsend(order)",
+      "regex": false,
+      "is_script": true,
+      "class": "",
+      "enabled": true,
+      "is_prompt": false,
+      "shortcut": "",
+      "script": null
     }
   ],
   "classes": [
@@ -3666,7 +3730,7 @@
       "fight",
       {
         "name": "fight",
-        "enabled": false
+        "enabled": true
       }
     ],
     [
@@ -3785,7 +3849,7 @@
       "automemorize",
       {
         "name": "automemorize",
-        "enabled": false
+        "enabled": true
       }
     ],
     [
@@ -3922,9 +3986,16 @@
       }
     ],
     [
-      "zone:157",
+      "questor",
       {
-        "name": "zone:157",
+        "name": "questor",
+        "enabled": false
+      }
+    ],
+    [
+      "monk",
+      {
+        "name": "monk",
         "enabled": false
       }
     ]
