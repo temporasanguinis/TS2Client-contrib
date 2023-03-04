@@ -208,7 +208,7 @@ NOTA: L'help sugli script predefiniti può essere invece consultato direttamente
 
 # 3. Elementi della finestra <a name="Elements"></a>
 
-<img src="Totale.jpg" alt="Totale" width="40%"/>
+<img src="./help/Totale.jpg" alt="Totale" width="40%"/>
 
 La applicazione contiene una grossa parte centrale per le risposte ricevute dal server di gioco.
 Per migliorare l'esperienza di gioco è possibile aggiungere finestre flottanti (si posizionano sopra l'area centrale) o bloccate su un lato (riducono l'area centrale ma non rischiano di nasconderne il contenuto).
@@ -231,13 +231,13 @@ Nell'impostazione predefinita l'applicazione può essere divisa in 4 aree princi
 
 ### 3.1.1 Riquadro dei pulsanti
 
-<img src="Pulsanti.jpg" alt="Pulsanti" width="40%"/>
+<img src="./help/Pulsanti.jpg" alt="Pulsanti" width="40%"/>
 
 Questi pulsanti permettono di vedere quali automatismi sono attivi e quali spenti. La pressione del tasto abilita/disabilita l'automatismo.
 
 ### 3.1.2 Riquadro delle statistiche
 
-<img src="Statistiche.jpg" alt="Statistiche" width="40%"/>
+<img src="./help/Statistiche.jpg" alt="Statistiche" width="40%"/>
 
 Questa compatta finestrella mostra, divise su 3 colonne, alcune informazioni utili.
 
@@ -258,7 +258,7 @@ Questo per permettere di non perdere alcun messaggio
 
 ### 3.1.4 Riquadro dello stato del gruppo
 
-<img src="Gruppo.jpg" alt="Gruppo" width="40%"/>
+<img src="./help/Gruppo.jpg" alt="Gruppo" width="40%"/>
 
 In questo riquadro sono elencati tutti i membri del gruppo (al primo posto il capogruppo). 
 
@@ -278,13 +278,13 @@ Per SANC, DO, il **+** indica la presenza dell'incantesimo, **-** l'assenza e **
 
 ### 3.1.5 Riquadro delle armi e degli scudi
 
-<img src="Armi.jpg" alt="Armi"/>
+<img src="./help/Armi.jpg" alt="Armi"/>
 
 Questi pulsanti permettono di vedere quale arma (colonna di sinistra) e scudo (colonna di destra) sono indossati. La pressione del tasto permette il cambio veloce dell'arma o dello scudo.
 
 ### 3.1.6 Riquadro dello stato del pg e del tick timer
 
-<img src="Stato.jpg" alt="Stato"/>
+<img src="./help/Stato.jpg" alt="Stato"/>
 
 Vengono indicati e rappresentati da barre i 4 indicatori:
 
@@ -301,7 +301,7 @@ E' il riquadro principale del gioco. Contiene i messaggi ricevuti dal server di 
 
 ### 3.2.2 Barra di stato
 
-<img src="Barra.jpg" alt="Barra di stato" width="60%"/>
+<img src="./help/Barra.jpg" alt="Barra di stato" width="60%"/>
 
 Nella riga più in alto viene indicato:
 
@@ -320,7 +320,7 @@ e sulla destra:
 
 ### 3.2.3 Barra delle azioni
 
-<img src="Barra.jpg" alt="Barra di stato" width="60%"/>
+<img src="./help/Barra.jpg" alt="Barra di stato" width="60%"/>
 
 La riga più in basso contiene il comando che si vuole mandare al server di gioco per comandare le azioni del proprio personaggio.
 A seguito dell'invio il comando rimane presente e selezionato per permettere di rimandarlo con la sola pressione dell'invio.
@@ -342,7 +342,7 @@ Questo per permettere di non perdere alcun messaggio.
 
 ### 3.3.2 Riquadro del mapper
 
-<img src="Mapper.jpg" alt="Mapper" width="40%"/>
+<img src="./help/Mapper.jpg" alt="Mapper" width="40%"/>
 
 Questa riquadro contiene una rappresentazione grafica della stanza in cui si trova il giocatore (quadratino con un punto rosso tipicamente al centro della finestra) e tutte quelle attorno.
 Tramite segni grafici vengono indicati i collegamenti tra le stanze, la presenza di porte e se il collegamento può essere percorso in una sola direzione.
@@ -413,7 +413,7 @@ Un elenco e una spiegazione degli alias preimpostati è visibile impartendo il c
 
 Gli alias sono script attivati da un comando impartito dal player nella riga di comando.
 
-![Alias](Alias.jpg)
+![Alias](./help/Alias.jpg)
 
 | Campo | Funzione |
 | ----- | -------- |
@@ -483,7 +483,7 @@ if (match[1]==="a") {  //Se la lettera passata ed intercettata nel gruppo 1 è a
 
 I trigger sono script attivati dalla ricezione dal server di gioco di particolari sequenze di testo.
 
-![Trigger](Trigger.jpg)
+![Trigger](./help/Trigger.jpg)
 
 | Campo | Funzione |
 | ----- | -------- |
@@ -505,7 +505,7 @@ Qualora serva lanciare un comando che non deve essere interpretato come alias è
 
 ## 4.3 Variabili <a name="variabili"></a>
 
-![Variabili](Variabili.jpg)
+![Variabili](./help/Variabili.jpg)
 
 E' possibile definire variabili il cui contenuto viene salvato nel profilo del personaggio e il cui valore quindi viene mantenuto anche all'uscita del WebClient.
 Queste variabili, accessibili dagli script con ```this.nome_variabile``` hanno una visibilità globale e possono essere accedute da tutti gli script (trigger, alias e eventi).
@@ -518,7 +518,7 @@ ATTENZIONE: il contenuto di queste variabili viene tramutato in JSON per permett
 
 ## 4.4 Classi <a name="classi"></a>
 
-![Classi](Classi.jpg)
+![Classi](./help/Classi.jpg)
 
 La classe è un descrittivo che può essere attribuito nel campo classe a Trigger, Alias e Eventi.
 
@@ -529,7 +529,7 @@ Ogni classe può poi essere abilitata e disabilitata. Questo produce la corrispo
 Gli eventi sono tipi speciali di [Trigger](#trigger), nel senso che entrambi sono script attivati automaticamente dal WebClient al verificarsi di una condizione in gioco.
 Se i [Trigger](#trigger) scattano quando il MUD manda la sequenza di testo impostata, gli eventi permettono di scattare all'accadere di altre condizioni.
 
-![Eventi](Eventi.jpg)
+![Eventi](./help/Eventi.jpg)
 
 
 | Campo | Funzione |
