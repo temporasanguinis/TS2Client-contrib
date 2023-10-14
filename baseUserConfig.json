@@ -1,6 +1,6 @@
 {
-  "version": 29,
-  "versionMessage": "fix ultimospell castato per recall; Aggiunta nella ricerca di ident la provenienza",
+  "version": 30,
+  "versionMessage": "Correzione bugs su ident; Aggiunto ident su Eowarion; Correzione delay su autobash; Aggiunta protezione al vai in DT",
   "requiresClientMajor": 1,
   "requiresClientMinor": 4,
   "requiresClientRevision": 3,
