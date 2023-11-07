@@ -1,6 +1,6 @@
 {
-  "version": 31,
-  "versionMessage": "Correzione bugs su ident; Aggiunto ident su Eowarion; Correzione delay su autobash; Aggiunta protezione al vai in DT",
+  "version": 32,
+  "versionMessage": "Il mapper ora dovrebbe mantenere la room a ingresso in gioco",
   "requiresClientMajor": 1,
   "requiresClientMinor": 4,
   "requiresClientRevision": 3,
