@@ -3021,7 +3021,7 @@
     {
       "pattern": "^wat(c|ch)?$",
       "id": "",
-      "value": "if (this.oggettoTrueSight) send(\"rem \" + this.oggettoTrueSight)\nsend(\"~watch\");\nif (this.oggettoTrueSight) send(\"wear \" + this.oggettoTrueSight)",
+      "value": "for (let key of (this.oggettoTrueSight||\"\").split(\",\")) {\n  if (key) send(\"rem \" + key.trim())\n}\nsend(\"~watch\");\nfor (let key of (this.oggettoTrueSight||\"\").split(\",\")) {\n  if (key) send(\"wear \" + key.trim())\n}",
       "regex": true,
       "is_script": true,
       "class": "util",
