@@ -3807,6 +3807,18 @@
       "is_prompt": false,
       "shortcut": "",
       "script": null
+    },
+    {
+      "pattern": "^autosplit ?(.*)?",
+      "id": "autosplit",
+      "value": "this.autosplit = !this.autosplit;\n\nif (match && match[1] != undefined) {\n\tthis.autosplit = (match[1] == \"true\" || match[1] == \"on\");\n}\n\ntoggleClass(\"autosplit\", this.autosplit);\nlet str = (\"AutoSplit: \"+ (this.autosplit ? \"ABILITATO\" : \"DISABILITATO\"));\nthis.diciStatus(str);",
+      "regex": true,
+      "is_script": true,
+      "class": "",
+      "enabled": true,
+      "is_prompt": false,
+      "shortcut": "",
+      "script": null
     }
   ],
   "classes": [
