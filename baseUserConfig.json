@@ -721,7 +721,7 @@
     {
       "pattern": "^(.*) e' morto|a! R\\.I\\.P\\.",
       "id": "",
-      "value": "this.cambiArma = 0;\nthis.impugnatoArma=true;\nthis.Mobs = \"\";\nthis.returnRoom = null;\nthis.stabTarget = null;\nthis.preventAntispalm = false;\nthis.disableCheckAssist=false;\nthis.preventAutoassist=false;\nif (this.autokill) {\n\tdelay(\"aklook\", 1000, () => send(\"look\"));\n}\nif (this.armaPrimaria && this.autoarmi && (this.zoneDaNonRimettereArma||0).toString()!=\"0\") {\n  delay(\"rimettiArma\",1000,()=>{\n    if (this.inCombat()) return;\n    let nozone = (this.zoneDaNonRimettereArma||\"\").split(\",\")\n    for (let z of nozone) {\n      if (Math.floor(Number(this.TSRoom)/100)==Math.floor(Number(z)/100)) {\n        return;\n      }\n    }\n    if (this.ultimaArma != this.armaBlunt && this.armaPrimaria==\"blunt\") {\n      send(\"blunt\")\n    }\n    else if (this.ultimaArma != this.armaSlash && this.armaPrimaria==\"slash\") {\n      send(\"slash\")\n    }\n    else if (this.ultimaArma != this.armaSlash && this.armaPrimaria==\"pierce\") {\n      send(\"pierce\")\n    }\n  });\n}",
+      "value": "this.cambiArma = 0;\nthis.impugnatoArma=true;\nthis.Mobs = \"\";\nthis.returnRoom = null;\nthis.stabTarget = null;\nthis.preventAntispalm = false;\nthis.disableCheckAssist=false;\nthis.preventAutoassist=false;\nif (this.autokill || this.onetimeLook) {\n  this,onetimeLook=false;\n\tdelay(\"aklook\", 1000, () => send(\"look\"));\n}\nif (this.armaPrimaria && this.autoarmi && (this.zoneDaNonRimettereArma||0).toString()!=\"0\") {\n  delay(\"rimettiArma\",1000,()=>{\n    if (this.inCombat()) return;\n    let nozone = (this.zoneDaNonRimettereArma||\"\").split(\",\")\n    for (let z of nozone) {\n      if (Math.floor(Number(this.TSRoom)/100)==Math.floor(Number(z)/100)) {\n        return;\n      }\n    }\n    if (this.ultimaArma != this.armaBlunt && this.armaPrimaria==\"blunt\") {\n      send(\"blunt\")\n    }\n    else if (this.ultimaArma != this.armaSlash && this.armaPrimaria==\"slash\") {\n      send(\"slash\")\n    }\n    else if (this.ultimaArma != this.armaSlash && this.armaPrimaria==\"pierce\") {\n      send(\"pierce\")\n    }\n  });\n}",
       "regex": true,
       "is_script": true,
       "class": "kill",
@@ -2490,7 +2490,7 @@
     {
       "pattern": "attack ?(.+)?",
       "id": "",
-      "value": "if (!match[1] && (!this.Mobs || !this.Mobs.length)) {\n\treturn;\n}\nlet mob = this.Mobs ? this.Mobs.split(\"|\").filter(m => {\n\treturn m.indexOf(\"famiglio\")<0;\n}) : [];\nlet victim = match[1] || (mob[0] ? mob[0] : \"\");\nif (!victim) return;\n\nvictim = victim.replace(/ /g, \"-\")\nif (this.canStab) {\n  send(\"backstab \" + victim);\n}\nelse if (this.canPlay) {\n  send(\"slam \" + victim);\n}\nelse if (this.canBash) {\n  send(\"bash \" + victim);\n}\nelse if (this.canKick) {\n  send(\"kick \" + victim);\n}else {\n  if (this.spellOffensivo) {\n    send(\"casta \" + victim);\n  } else {\n\tsend(\"hit \" + victim);\n  }\n}\nthis.onetimeLook = true;",
+      "value": "let victim;\n\nif (!match[1]) {\n  //Se non c'è definito un target prendo come target il mob in combat se c'è oppure il primo della lista  \n  if (this.TSTank!=\"*\") {\n    victim = this.TSMob;\n    if (this.debug) print(\"attacking TSMob\");\n  } else if (this.Mobs && this.Mobs.length) {\n    let mob = this.Mobs ? this.Mobs.split(\"|\").\n      filter(m => (m.indexOf(\"famiglio\")<0)).\n      filter(m => (m.indexOf(\"mercenario\")!=0)) : [];\n    victim = match[1] || (mob[0] ? mob[0] : \"\");\n    if (this.debug) print(\"attacking first mob in list\");\n  }\n} else {\n  victim = match[1];\n}\n\nif (!victim) return;\n\nvictim = victim.replace(/ /g, \"-\")\nif (this.canStab && (this.ultimaArma == this.armaPierce)) {\n  //Per il ladro, se fuori combat parte di backstab, \n  //se in combat va di restab\n  if (!this.inCombat()) {\n    send(\"backstab \" + victim);\n  } else {\n    send(\"rs\");\n  }\n}\nelse if (this.canPlay) {\n  send(\"slam \" + victim);\n}\nelse if (this.canBash) {\n  send(\"bash \" + victim);\n}\nelse if (this.canKick) {\n  send(\"kick \" + victim);\n}else {\n  if (this.spellOffensivo) {\n    send(\"casta \" + victim);\n  } else {\n\tsend(\"hit \" + victim);\n  }\n}\nthis.onetimeLook = true;",
       "regex": true,
       "is_script": true,
       "class": "",
@@ -2508,18 +2508,6 @@
       "class": "",
       "enabled": true,
       "is_prompt": false,
-      "script": null
-    },
-    {
-      "pattern": "extra",
-      "id": "",
-      "value": "if (!this.armaExtra || this.ultimaArma == this.armaExtra) return;\n//send(`rem ${this.borsa}`);\nsend(`get ${this.armaExtra} ${this.borsaArmi||this.borsa}`);\nif (this.ultimaArma) {\n  send(`rem ${this.ultimaArma}`);\n} else {\n  if (this.armaPierce) send(`rem ${this.armaPierce}`);\n  if (this.armaSlash) send(`rem ${this.armaSlash}`);\n  if (this.armaBlunt) send(`rem ${this.armaBlunt}`);\n  if (this.arco) send(`rem ${this.arco}`);\n}\nsend(`~wield ${this.armaExtra}`);\nif (this.ultimaArma) {\n  send(`put ${this.ultimaArma} ${this.borsaArmi||this.borsa}`);\n} else {\n  if (this.armaSlash) send(`put ${this.armaSlash} ${this.borsaArmi||this.borsa}`);\n  if (this.armaBlunt) send(`put ${this.armaBlunt} ${this.borsaArmi||this.borsa}`);\n  if (this.armaPierce) send(`put ${this.armaPierce} ${this.borsaArmi||this.borsa}`);\n  if (this.arco) send(`put ${this.arco} ${this.borsaArmi||this.borsa}`);\n}\n//send(`wear ${this.borsa}`);\nif (this.usiArco) {\n  send(`put faretra ${this.borsaArmi||this.borsa}`);\n  if (this.freccia) send(`put ${this.freccia} ${this.borsaArmi||this.borsa}`)\n}\nthis.usiSlash = false;\nthis.usiBlunt = false;\nthis.usiPierce = false;\nthis.usiExtra = true;\nthis.usiArco = false;\nthis.ultimaArma = this.armaExtra;",
-      "regex": false,
-      "is_script": true,
-      "class": "armi",
-      "enabled": true,
-      "is_prompt": false,
-      "shortcut": "",
       "script": null
     },
     {
@@ -2581,7 +2569,7 @@
     {
       "pattern": "^casta ?(.+)?$",
       "id": "",
-      "value": "if (this.healtype) send(\"cura\");\nlet comando = this.mustMemorize ? \"recall\" : this.mustMind ? \"mind\" : \"cast\";\nlet spell = this.spellOffensivo;\nif (!spell) return;\nlet vittima = null;\nif (match[1]) {\n  vittima = match[1];\n}\nelse if (this.TSMob != \"*\") {\n  vittima = this.TSMob.replace(/ /g,\"-\");\n  this.onetimeLook=true;\n} else if (this.Mobs && this.Mobs.length) {\n  vittima = this.Mobs.split(\"|\")[0].replace(/ /g,\"-\");\n  this.onetimeLook=true;\n}\nif (vittima) send(`${comando} '${spell}' ${vittima}`);\n",
+      "value": "if (this.healtype) send(\"cura\");\nlet comando = this.mustMemorize ? \"recall\" : this.mustMind ? \"mind\" : \"cast\";\nlet spell = this.spellOffensivo;\nif (!spell) return;\n\nlet victim;\n\nif (!match[1]) {\n  //Se non c'è definito un target prendo come target il mob in combat se c'è oppure il primo della lista  \n  if (this.TSTank!=\"*\") {\n    victim = this.TSMob;\n    if (this.debug) print(\"attacking TSMob\");\n  } else if (this.Mobs && this.Mobs.length) {\n    let mob = this.Mobs ? this.Mobs.split(\"|\").\n      filter(m => (m.indexOf(\"famiglio\")<0)).\n      filter(m => (m.indexOf(\"mercenario\")!=0)) : [];\n    victim = match[1] || (mob[0] ? mob[0] : \"\");\n    if (this.debug) print(\"attacking first mob in list\");\n  }\n} else {\n  victim = match[1];\n}\n\nif (!victim) return;\n\nvictim = victim.replace(/ /g, \"-\")\nsend(`${comando} '${spell}' ${victim}`);\nthis.onetimeLook=true;\n",
       "regex": true,
       "is_script": true,
       "class": "",
@@ -3807,6 +3795,18 @@
       "is_prompt": false,
       "shortcut": "",
       "script": null
+    },
+    {
+      "class": "scudi",
+      "enabled": true,
+      "id": "",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "cambiascudo",
+      "regex": false,
+      "value": "if (!this.ultimoScudo) {\n  send(\"ia\");\n  return;\n}\n\nif (this.ultimoScudo == this.scudoAcid) {\n  send(\"ie\");\n} else if (this.ultimoScudo == this.scudoEle) {\n  send(\"ic\");\n} else if (this.ultimoScudo == this.scudoCold) {\n  send(\"if\");\n} else if (this.ultimoScudo == this.scudoFire) {\n  send(\"ia\");\n}",
+      "shortcut": "",
+      "script": null
     }
   ],
   "classes": [
@@ -4116,10 +4116,10 @@
   "aliasesEnabled": true,
   "soundsEnabled": true,
   "numpad": {
-    "NumpadSubtract": "immufire",
+    "NumpadSubtract": "cambiascudo",
     "NumpadAdd": "cambiaarma",
-    "NumpadMultiply": "immuele",
-    "NumpadDivide": "immucold",
+    "NumpadMultiply": "",
+    "NumpadDivide": "",
     "NumpadEnter": "",
     "NumpadDecimal": "porte",
     "Numpad0": "cura",
