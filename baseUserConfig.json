@@ -855,7 +855,7 @@
     {
       "pattern": "^(.*) ti cade dalle mani$",
       "id": "",
-      "value": "if (this.holdItem) send(`hold ${this.holdItem}`);\n\nif (this.ultimoHold) {\n  send(\"~hold \" + this.ultimoHold);\n} else {\n  if (this.holdItem) {\n    if (arma) send(\"hold \" + this.holdItem)\n  } else {\n    print(\"ARMA HOLD NON REIMPUGNATA\");\n    print(\"Definire l'oggetto hold nel setup\");\n  }\n}\n",
+      "value": "if (this.ultimoHold) {\n  send(\"~hold \" + this.ultimoHold);\n} else {\n  if (this.holdItem) {\n    send(`hold ${this.holdItem}`)\n  } else {\n    print(\"ARMA HOLD NON REIMPUGNATA\");\n    print(\"Definire l'oggetto hold nel setup\");\n  }\n}\n",
       "regex": true,
       "is_script": true,
       "class": "armi",
