@@ -107,6 +107,19 @@
   ],
   "script_events": [
     [
+	  "CommandExecuted",
+	  [
+	    {
+		  "type":"CommandExecuted",
+		  "condition":"false",
+		  "id":"afkReset",
+		  "value":"if (args.command.toLowerCase() != \"afk\") {\n  send(\"afk false\")\n}",
+		  "class":"",
+		  "enabled":true
+		}
+	  ]
+	],
+    [
       "VariableChanged",
       [
         {
