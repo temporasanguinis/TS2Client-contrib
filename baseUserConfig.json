@@ -1,9 +1,9 @@
 {
   "version": 36,
-  "versionMessage": "Aggiunte nuove funzionalita per monk, trappole e altri cose nuove",
+  "versionMessage": "Aggiunte nuove funzionalita per monk, trappole e altri cose nuove, alias staffe, correzioni a alcuni problemi",
   "requiresClientMajor": 1,
   "requiresClientMinor": 6,
-  "requiresClientRevision": 0,
+  "requiresClientRevision": 1,
   "text-color": "green-on-black",
   "wrap-lines": true,
   "utf8Enabled": false,
@@ -3892,6 +3892,40 @@
       "value": "const oldVal = this.autodisarm;\n\nthis.autodisarm = !this.autodisarm;\n\nif (match && match[1] != undefined) {\n\t// se passato parametro esso comanda (e.g. autoassist false)\n\tthis.autodisarm = (match[1] == \"true\" || match[1] == \"on\");\n}\n\nif (oldVal != this.autodisarm) {\n  let str = (\"AutoDisarm: \"+ (this.autodisarm ? \"ABILITATO\" : \"DISABILITATO\"));\n  this.diciStatus(str);\n}\nif (this.autodisarm) send(\"autotraps on\");",
       "shortcut": "",
       "script": null
+    },
+	{
+      "class": "util|staffe",
+      "enabled": true,
+      "id": "",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "^(bastone|bacchetta)(?:\\s+(.+))?$",
+      "regex": true,
+      "value": "if (!$2) {\n  const staffe = getvar(\"staffe\")\n  let search = $1 + \" \" + getvar(\"staffa\")\n  let tipostaffa = $1\n  \n  if (search && staffe[0]) {\n    let i = staffe.findIndex(v => v.indexOf(search) == 0)\n    if (i == -1) {\n      search = $1\n      i = staffe.findIndex(v => v.indexOf(search) == 0)\n    }\n    let newI = -1;\n    if (i>-1) {\n      for (let x = i+1; x < staffe.length; x++) {\n        if (staffe[x].indexOf(tipostaffa) == 0) {\n          newI = x;\n          break;\n        }\n      }\n    }\n    if (newI >= staffe.length || newI < 0) {\n      for (let x = 0; x < i; x++) {\n        if (staffe[x].indexOf(tipostaffa) == 0) {\n          newI = x;\n          break;\n        }\n      }\n    }\n    if (newI > -1 && newI < staffe.length) {\n      send(staffe[newI])\n    }\n  }\n  return\n}\nsetvar(\"staffa\", $2)\n//setvar(\"tipostaffa\", $1)\nprint($1.toUpperCase() + \" da usare assegnata/o: \" + color($2, \"red\"))",
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "class": "util|staffe",
+      "enabled": true,
+      "id": "",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "usastaffa",
+      "regex": false,
+      "value": "let listastaffe = getvar(\"listastaffe\")\nif (!listastaffe) {\n  print(\"Non hai una lista di staffe configurate. Usa alias staffe.\")\n  return;\n}\n\nconst staffe = new Map(listastaffe);\n\nsetvar(\"staffe\", [...staffe].map(kv => kv[1].tipo + \" \" + kv[0]))\n\nconst tipoStaffa = getvar(\"staffa\")\nif (!tipoStaffa) return;\nif (!staffe.has(tipoStaffa)) {\n  print(\"La staffa \" + tipoStaffa + \" non e' configurata\")\n  return;\n}\n\nconst datiStaffa = staffe.get(tipoStaffa)\nif (!datiStaffa) return;\n\nlet holdando = getvar(\"ultimoHold\") || getvar(\"holdItem\")\n\nif (holdando) send(\"rem \"+holdando)\nconst target = ($1||getvar(\"TSPersonaggio\"))\n\nsend(`\n  ${datiStaffa.prendi} ${datiStaffa.key}\n  ~hold ${datiStaffa.key}\n  use ${datiStaffa.key} ${datiStaffa.tipo==\"bacchetta\"?target:\"\"}\n  rem ${datiStaffa.key}\n  ${datiStaffa.riponi} ${datiStaffa.key}\n  `)\n\nif (holdando) send(\"~hold \"+holdando)\n",
+      "shortcut": ""
+    },
+    {
+      "class": "util|staffe",
+      "enabled": true,
+      "id": "",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "staffe",
+      "regex": false,
+      "value": "let listastaffe = getvar(\"listastaffe\") || [\n  /*[\"invis\", { key: \"bacchetta\", tipo: \"bacchetta\", prendi: \"gb\", riponi: \"pb\"}],\n  [\"sleep\", { key: \"scettro-magico\", tipo: \"bastone\", prendi: \"unstash\", riponi: \"stash\"}],\n  [\"heal\", { key: \"bacchetta-heal\", tipo: \"bacchetta\", prendi: \"gb\", riponi: \"pb\"}],\n  [\"shield\", { key: \"scettro-shield\", tipo: \"bastone\", prendi: \"unstash\", riponi: \"stash\"}],\n*/]\n\nlet askStaffa = async (staffa) => {\n  let nome = staffa[0]\n  let key = staffa[1].key\n  let bacchetta = staffa[1].tipo == \"bacchetta\" ? true : false\n  let stash = staffa[1].prendi == \"unstash\" ? true : false\n  let res = await Messagebox.ShowMultiInput((staffa[1].tipo + \" \" + staffa[0]).toUpperCase(), [\"Nome\",\"Key\",\"Bacchetta?\", \"Da stash\"], [nome, key, bacchetta, stash]) \n  if (res.button == 1) {\n    nome = res.results[0]\n    key = res.results[1]\n    bacchetta = res.results[2]\n    stash = res.results[3]\n    staffa[0] = nome\n    staffa[1].key = key\n    staffa[1].tipo = bacchetta ? \"bacchetta\" :\"bastone\"\n    staffa[1].prendi = stash ? \"unstash\" : \"gb\"\n    staffa[1].riponi = stash ? \"stash\" : \"pb\"\n    print(`${bacchetta ? \"Bacchetta\":\"Bastone\"} ${nome} con key: ${key} ${stash ? \"Da stash\":\"Da borsa\"}`)\n    return staffa\n  } else {\n    if (res.result) {\n      return null\n    } else {\n      return -1\n    }\n  }\n}\n\nlet printStaffe = () => {\n  print(\"Le tue staffe:\")\n  print(listastaffe.map(v => {\n    return color(v[0],\"white\") + \" : \" + v[1].tipo + \" con key: '\" + v[1].key + \"' \" + (v[1].prendi == \"unstash\" ? \"(da stash)\" : \"\")\n  }).join(\"\\n\"))\n}\nlet configuraStaffe = async () => {\n  if (listastaffe.length) {\n    await Messagebox.Show(\"Info\", \"Stai per modificare la lista delle staffe.\\nPremi Annulla per interrompere.\\nCancella il nome ad una per cancellarla.\")\n  }\n  for (let i = 0; i < listastaffe.length; i++) {\n    let lstItem = listastaffe[i]\n    let res = await askStaffa(clone(lstItem))\n    if (res == null) {\n      print(\"Ok, Interrompo.\")\n      return;\n    }\n    if (res == -1 || !res[0]) {\n      print(\"Cancello la staffa.\")\n      listastaffe.splice(i, 1)\n      i--;\n    } else {\n      listastaffe[i] = clone(res)\n    }\n  }\n  let newEl = null\n  let template = () => {\n    return [\"nuovo bastone\",{\"key\":\"\",\"tipo\":\"bastone\",\"prendi\":\"gb\",\"riponi\":\"pb\"}]\n  }\n  if ((await Messagebox.Question(\"Vuoi inserire nuove staffe?\\nPremi Annulla quando hai finito.\")).button==1) while ((newEl = await askStaffa(clone(template()))) && newEl != null && newEl != -1) {\n    if (newEl[0] && newEl[1].key) {\n      listastaffe.push(newEl)\n    } else if (!newEl[0] || !newEl[1].key) {\n      print(\"Errore: I campi Nome e Key sono necessari. Premi Annulla se vuoi interrompere.\")\n    } else {\n      break;\n    }\n  }\n  printStaffe()\n  setvar(\"listastaffe\", [...listastaffe])\n  delvar(\"staffa\")\n  delvar(\"staffe\")\n  setvar(\"staffa\", listastaffe.length ? [...listastaffe][0][0] : \"\")\n  setvar(\"staffe\", [...listastaffe].map(kv => kv[1].tipo + \" \" + kv[0]))\n  print(\"Ok ora puoi usare alias bacchetta, bastone e usastaffa\")\n}\nif (listastaffe.length) {\n  printStaffe()\n  print(link(\"MODIFICA\", configuraStaffe))\n} else {\n  print(\"Non hai staffe configurate.\")\n  print(link(\"CONFIGURA\", configuraStaffe))\n}\n",
+      "shortcut": ""
     }
   ],
   "classes": [
@@ -3899,6 +3933,13 @@
       "cleric",
       {
         "name": "cleric",
+        "enabled": false
+      }
+    ],
+	[
+      "util|staffe",
+      {
+        "name": "util|staffe",
         "enabled": false
       }
     ],
