@@ -744,7 +744,7 @@
       "script": null
     },
     {
-      "pattern": "^Impugni (.+)\\.",
+      "pattern": "^.+\\: Impugni (.+)\\.",
       "id": "",
       "value": "this.impugnatoArma = true;",
       "regex": true,
@@ -752,8 +752,7 @@
       "class": "",
       "enabled": true,
       "is_prompt": false,
-      "shortcut": "",
-      "script": null
+      "shortcut": ""
     },
     {
       "pattern": "^(Un'ENORME creatura esce fuori dal pozzo e spalanca le sue|Vhal il maledetto e' qui, in piedi)",
