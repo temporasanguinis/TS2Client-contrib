@@ -42,5 +42,10 @@
   {"long": "Noti una liana tesa a terra.", "key": "liana"},
   {"long": "Una piccola trappola quasi invisibile non sfugge al tuo occhio allenato.", "key": "trappola"},
   {"long": "Vedi sul muro una runa brillare di una debole luce rossa.", "key": "runa"},
-  {"long": "una roccia spigolosa impedisce il passaggio.", "key": "roccia"}  
+  {"long": "una roccia spigolosa impedisce il passaggio.", "key": "roccia"},
+  {"long": "Un filo  passa davanti  al portone", "key": "filo"}
 ]
+
+
+
+
