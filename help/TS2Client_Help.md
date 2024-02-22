@@ -1079,10 +1079,10 @@ repeat(id: string, milliseconds: number, function: fn())
 ```js
 repeat('test_repeat', 3000, ()=>{send('smile')})
 ```
-per fermarlo si passa null a function:
+per fermarlo usare repeat passando il solo id.
 **Esempio d'uso**:
 ```js
-repeat('test_repeat', 0, null)
+repeat('test_repeat')
 ```
 
 ### send <a name="f_send"></a>
