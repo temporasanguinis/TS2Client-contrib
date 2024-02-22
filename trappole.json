@@ -31,6 +31,7 @@
   {"long": "Un'enorme lama e' qui in terra.", "key": "lama"},
   {"long": "Una ragnatela ti impedisce il passaggio...", "key": "ragnatela"},
   {"long": "Un grosso lastrone di granito, piuttosto rovinato, giace a terra.", "key": "lastrone"},
+  {"long": "Un grosso lastrone di quarzo, piuttosto rovinato, giace a", "key":"lastrone"},
   {"long": "Una ragnatela ti impedisce il passaggio.", "key": "ragnatela"},
   {"long": "Noti una trappola posizionata sul fondo del pozzo.", "key": "trappola"},
   {"long": "noti dei filamenti oscuri avvolgere i cunicoli......", "key": "ragnatela"},
@@ -43,7 +44,12 @@
   {"long": "Una piccola trappola quasi invisibile non sfugge al tuo occhio allenato.", "key": "trappola"},
   {"long": "Vedi sul muro una runa brillare di una debole luce rossa.", "key": "runa"},
   {"long": "una roccia spigolosa impedisce il passaggio.", "key": "roccia"},
-  {"long": "Un filo  passa davanti  al portone", "key": "filo"}
+  {"long": "Un filo  passa davanti  al portone", "key": "filo"},
+  {"long": "Una trappola e' qui in terra.", "key": "trappola"},
+  {"long": "Fiamme ardono tutto intorno a te.", "key": "fiamme"},
+  {"long": "Una pianta di oleandro occupa tutta la strada.", "key":"trappola"},
+  {"long": "una roccia spigolosa impedisce il passaggio.", "key":"spigolo"},
+  {"long": "Noti una stranezza sul muro...", "key":"trappola"}
 ]
 
 
