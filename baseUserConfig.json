@@ -1663,7 +1663,7 @@
       "id": "whereend",
       "is_prompt": false,
       "is_script": true,
-      "pattern": "$^|^Non trovi nulla del genere\\.$",
+      "pattern": "^$|^Non trovi nulla del genere\\.$",
       "regex": true,
       "value": "//Normalmente disabilitato. Viene abilitato da where o da cast commune\n//$^|^Non trovi nulla del genere\\.$|^!?H:.*\\>\n\ntoggleTrigger(\"wheretrg\",false)\ntoggleTrigger(\"whereend\", false)\n",
       "shortcut": "",
