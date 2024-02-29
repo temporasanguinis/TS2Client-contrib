@@ -1646,14 +1646,38 @@
       "script": null
     },
     {
-      "class": "util",
-      "enabled": true,
-      "id": "where",
+      "class": "where",
+      "enabled": false,
+      "id": "wheretrg",
       "is_prompt": false,
       "is_script": true,
-      "pattern": "^\\[ 1\\] .+- (.+)$",
+      "pattern": "^\\[ 1\\] .+- (.+)$|^.+ e' in (.+)$",
       "regex": true,
-      "value": "if (match[1].trim() == \"Qui intorno...\") return;\nconst roomname = match[1].trim();\nvar zona_attuale = mapper.current.zone_id\n\n//const res = mapper.searchRooms(match[1].trim())\nlet res = mapper.searchRoomsByNameAndDesc(roomname)\nres = res.filter(r => r.name === roomname)\nres = res.filter(r => mapper.getRoomZone(r.id).id === zona_attuale)\n\nconst getLinkVai = (roomid)=>{\n  return link(color(\"[\" + roomid +\"]\",\"yellow\"),()=>{send(\"vai \"+roomid )},\"VAI \"+roomid);\n}\nconst arrayrooms = res.map( room=>getLinkVai(room.id) )\nthis.searchRooms = () => res\n//send(\"ricercaPrecedente\")\nsub(match[0], match[0] + \"   \" + arrayrooms.join(\" \"));\n",
+      "value": "//Normalmente disabilitato. Viene abilitato da where o da cast commune\nconst roomname = (match[1] || match[2]).trim();\nif (roomname != \"Qui intorno...\") {\n  var zona_attuale = mapper?.current?.zone_id ||-1\n\n  //const res = mapper.searchRooms(match[1].trim())\n  let res = mapper.searchRoomsByNameAndDesc(roomname)\n  res = res.filter(r => r.name === roomname)\n  res = res.filter(r => mapper.getRoomZone(r.id).id === zona_attuale)\n\n  const getLinkVai = (roomid)=>{\n    return link(color(\"[\" + roomid +\"]\",\"yellow\"),()=>{send(\"vai \"+roomid )},\"VAI \"+roomid);\n  }\n  const arrayrooms = res.map( room=>getLinkVai(room.id) )\n  this.searchRooms = () => res\n  //send(\"ricercaPrecedente\")\n  if (res.length>0) {\n    const lvai = getLinkVai(res[0].id)\n    sub(match[0], match[0] + \"   \" + lvai + ((res.length>1)?color(\" [...e altre]\",\"yellow\"):\"\"));\n  }\n}\nif (!match[2]) {\n  //Nel caso di where ho una riga sola quindi disabilito il trigger\n  //Nel caso di commune tengo attivo per intercettare tutte le righe fino alla fine\n  toggleTrigger(\"wheretrg\",false)\n  toggleTrigger(\"whereend\", false)\n}\n",
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "class": "where",
+      "enabled": false,
+      "id": "whereend",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "$^|^Non trovi nulla del genere\\.$",
+      "regex": true,
+      "value": "//Normalmente disabilitato. Viene abilitato da where o da cast commune\n//$^|^Non trovi nulla del genere\\.$|^!?H:.*\\>\n\ntoggleTrigger(\"wheretrg\",false)\ntoggleTrigger(\"whereend\", false)\n",
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "class": "where",
+      "enabled": true,
+      "id": "commune",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "^Pronunci le parole, 'commune'\\.$",
+      "regex": true,
+      "value": "toggleTrigger(\"wheretrg\", true);\ntoggleTrigger(\"whereend\", true);",
       "shortcut": "",
       "script": null
     }
@@ -2760,9 +2784,9 @@
       "script": null
     },
     {
-      "pattern": "^wi(e|el|eld)? (.+)$|^imp(u|ug|ugn|ugna)? (.+)$",
+      "pattern": "^wi(?:e|el|eld)?(?: (.+))?$|^imp(?:u|ug|ugn|ugna)?(?: (.+))?$",
       "id": "",
-      "value": "const arma = match[2] || match[4];\nsend(\"~wield \" + arma);\nthis.ultimaArma = arma",
+      "value": "const arma = match[1] || match[2] || this.ultimaArma;\nsend(\"~wield \" + arma);\nthis.ultimaArma = arma",
       "regex": true,
       "is_script": true,
       "class": "armi",
@@ -4030,6 +4054,18 @@
       "pattern": "^track (.+)",
       "regex": true,
       "value": "const mob = match[1];\nsetvar(\"trackmob\",mob,true);\nsend(\"~track \" + mob);\nif (this.isCapogruppo(this.TSPersonaggio)) return;\n\nlet gruppo = JSON.parse(this.Gruppo);\nlet k = Object.keys(gruppo).slice(2);\nlet capogruppo=k[0]\nif (gruppo[capogruppo]?.inroom!=1) return;\n\nsend(\"gtTrigger Cerco le tracce di: \" + mob);\ntoggleTrigger(\"track-cerca\",true);\ntoggleTrigger(\"track-fine\",true);       \n",
+      "shortcut": "",
+      "script": null
+    },
+    {
+      "class": "where",
+      "enabled": true,
+      "id": "where",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "^whe(?:r|re)? (.+)$",
+      "regex": true,
+      "value": "send(\"~where \" + match[1]);\ntoggleTrigger(\"wheretrg\",true)\ntoggleTrigger(\"whereend\", true)",
       "shortcut": "",
       "script": null
     }
