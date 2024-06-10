@@ -1,5 +1,5 @@
 {
-  "version": 38,
+  "version": 39,
   "versionMessage": "Correzioni ad alias 'ub/us/usastaffa' e 'tool socket', Where e altro. Aggiunto tool ident.",
   "requiresClientMajor": 1,
   "requiresClientMinor": 6,
