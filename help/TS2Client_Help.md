@@ -681,6 +681,22 @@ Utility per gli alias.
  isEnabled(aliasId:string) -> bool
 ```
 
+### append <a name="f_append"></a>
+
+All'interno di un [trigger](#triggers) aggiunge il testo specificato alla fine della stringa che ha fatto scattare il trigger.
+Vedi anche  [prepend](#f_prepend) e [sub](#f_sub)
+
+**Sintassi**
+```js
+append(cosa: string)
+```
+
+**Esempio d'uso**
+```js
+prepend(color("[","yellow"))
+append(color("]","yellow"))
+```
+
 ### cap <a name="f_cap"></a>
 
 Se usato all'interno di un [trigger](#triggers) copia la linea che ha fatto scattare il trigger nella finestra 'window'
@@ -1161,6 +1177,23 @@ Suona un file audio dall'URL specificato.
 ```js
 playAudio(url: string)
 ```
+
+### prepend <a name="f_prepend"></a>
+
+All'interno di un [trigger](#triggers) aggiunge il testo specificato all'inizio della stringa che ha fatto scattare il trigger.
+Vedi anche  [append](#f_append) e [sub](#f_sub)
+
+**Sintassi**
+```js
+prepend(cosa: string)
+```
+
+**Esempio d'uso**
+```js
+prepend(color("[","yellow"))
+append(color("]","yellow"))
+```
+
 
 ### print <a name="f_print"></a>
 
