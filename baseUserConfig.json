@@ -1,9 +1,9 @@
 {
-  "version": 40,
+  "version": 41,
   "versionMessage": "Varie aggiunte per la nuova versione",
   "requiresClientMajor": 2,
   "requiresClientMinor": 0,
-  "requiresClientRevision": 4,
+  "requiresClientRevision": 11,
   "text-color": "green-on-black",
   "wrap-lines": true,
   "utf8Enabled": false,
