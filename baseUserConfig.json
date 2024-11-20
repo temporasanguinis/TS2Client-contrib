@@ -252,6 +252,17 @@
   ],
   "triggers": [
     {
+      "class": "immortal",
+      "enabled": true,
+      "id": "",
+      "is_prompt": false,
+      "is_script": true,
+      "pattern": "HP\\:\\d+\\/\\d+ Room\\:\\d+ Inv\\:\\<(\\d+)\\> Stealth\\:\\<(\\w+)\\> Snoop\\:\\<(\\w*)\\>",
+      "regex": true,
+      "value": "@Inv=$1\n@Stealth=$2\n@Snoop=$3",
+      "shortcut": ""
+    },
+    {
       "class": "",
       "enabled": true,
       "id": "traguardoDivini",
