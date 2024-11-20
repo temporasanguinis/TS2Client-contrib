@@ -129,6 +129,12 @@
           "tooltip": "Premendo qui cambi lo stato di AFK"
         },
         {
+          "type": 1,
+          "paneId": null,
+          "content": "Room:%(TSRoom) Inv:%(Inv,%(Inv),0) Stealth:%(Stealth,<On>,<Off>) Snoop:%(Snoop,%(Snoop),<Off>)",
+          "visible": "Immortal"
+        },
+        {
           "paneId": null,
           "color": "rgb(255, 255, 255)",
           "background": "rgba(0,0,0,0.33)",
@@ -136,7 +142,8 @@
           "content": "%(`%(sancato,%c0015%(scadenzaSanc,, )Sancato%(scadenzaSanc,%c5011(!)%cc,),%c1011 No Sanc! %cc)`,-10)",
           "css": "position:relative;border-radius:3px;margin-left:3px;padding:1px",
           "commands": "sanc",
-          "tooltip": "Sanca o verda"
+          "tooltip": "Sanca o verda",
+          "visible": "!Immortal"
         },
         {
           "paneId": null,
@@ -146,7 +153,8 @@
           "content": "%(`%(scudato,%c0001%(scadenzaScudo,, )Scudato%(scadenzaScudo,%c5009(!)%cc,),%c1009No Scudo !%cc)`,-10)",
           "css": "position:relative;border-radius:3px;margin-left:3px;padding:1px",
           "commands": "fs",
-          "tooltip": "Scudati"
+          "tooltip": "Scudati",
+          "visible": "!Immortal"
         },
         {
           "paneId": null,
@@ -156,7 +164,8 @@
           "content": "Spell:(%(spells))",
           "css": "position:relative;font-weight:bold;border-radius:3px;margin-left:3px;padding:1px",
           "commands": "spells",
-          "tooltip": "Mostra tutti gli incantesimi attivi"
+          "tooltip": "Mostra tutti gli incantesimi attivi",
+          "visible": "!Immortal"
         },
         {
           "paneId": null,
