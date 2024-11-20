@@ -1,8 +1,8 @@
 {
-  "version": 5,
+  "version": 6,
   "requiresClientMajor": 2,
   "requiresClientMinor": 0,
-  "requiresClientRevision": 12,
+  "requiresClientRevision": 11,
   "customized": false,
   "color": "",
   "background": "",
