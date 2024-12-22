@@ -1,5 +1,5 @@
 {
-  "version": 45,
+  "version": 46,
   "versionMessage": "Min fix, Niav",
   "requiresClientMajor": 2,
   "requiresClientMinor": 0,
@@ -984,7 +984,7 @@
     {
       "pattern": "^Premi \\<Invio\\>\\:",
       "id": "premiinvio",
-      "value": "send(\" \", true)\ntoggleTrigger(\"premiinvio\", false);\ndelay(\"enable_premiinvio\",500,()=>{\n  toggleTrigger(\"premiinvio\",true)\n})",
+      "value": "send(\" \", true)\ntoggleTrigger(\"premiinvio\", false);\ndelay(\"enable_premiinvio\",10,()=>{\n  toggleTrigger(\"premiinvio\",true)\n})",
       "regex": true,
       "is_script": true,
       "class": "login",
