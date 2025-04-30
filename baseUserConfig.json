@@ -1,6 +1,6 @@
 {
-  "version": 46,
-  "versionMessage": "Min fix, Niav",
+  "version": 47,
+  "versionMessage": "fix a vari triggers, msg privati, update db ident",
   "requiresClientMajor": 2,
   "requiresClientMinor": 0,
   "requiresClientRevision": 14,
